@@ -3,4 +3,4 @@ project(VRM_Parser)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(VRM_Parser main.cpp)
+add_executable(VRM_Parser Source/main.cpp)
