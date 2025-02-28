@@ -5,9 +5,16 @@
 #pragma once
 
 #include <string>
+#include "assimp/scene.h"
 
 class Model {
 
 public:
     explicit Model(const std::string& filePath);
+
+private:
+    void SceneProcessing(const aiScene* scene);
+
+protected:
+    std::string m_directory;
 };
