@@ -14,6 +14,7 @@ public:
 
 private:
     void SceneProcessing(const aiScene* scene);
+    void NodeProcessing(const aiNode *node, const aiScene *scene);
 
 protected:
     std::string m_directory;
