@@ -35,19 +35,24 @@ void Model::SceneProcessing(const aiScene *scene) {
     NodeProcessing(scene->mRootNode, scene);
 }
 
+// 查看骨骼是否有不为0的权重，如果不是，则该骨骼无效
+bool Model::BoneHasWeights(const aiBone *bone) {
+    for (int i = 0; i < bone->mNumWeights; ++i) {
+        if (bone->mWeights[i].mWeight > 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void Model::NodeProcessing(const aiNode *node, const aiScene *scene) {
     for (int i = 0; i < node->mNumMeshes; ++i) {
         aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
         std::cout << "processing mesh " << mesh->mName.data << std::endl;
         std::pmr::vector<std::string> boneNames;
         for (int j = 0; j < mesh->mNumBones; ++j) {
-            if (mesh->mBones[j]->mNumWeights > 0) {
-                for (int k = 0; k < mesh->mBones[j]->mNumWeights; ++k) {
-                    if (mesh->mBones[j]->mWeights[k].mWeight > 0) {
-                        boneNames.emplace_back(mesh->mBones[j]->mName.data);
-                        break;
-                    }
-                }
+            if (BoneHasWeights(mesh->mBones[j])) {
+                boneNames.emplace_back(mesh->mBones[j]->mName.data);
             }
         }
         std::cout << "numBones: " << boneNames.size() << std::endl;

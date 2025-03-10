@@ -16,6 +16,8 @@ private:
     void SceneProcessing(const aiScene* scene);
     void NodeProcessing(const aiNode *node, const aiScene *scene);
 
+    static bool BoneHasWeights(const aiBone* bone);
+
 protected:
     std::string m_directory;
 };
