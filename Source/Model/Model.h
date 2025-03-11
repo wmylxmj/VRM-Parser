@@ -6,8 +6,11 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include "assimp/scene.h"
+
+#define INVALID_PARENT 0XFFFFFFFF
 
 typedef struct {
     float position[3];
@@ -15,7 +18,7 @@ typedef struct {
 } Vertex;
 
 typedef struct {
-
+    unsigned int parentIndex;
 } Bone;
 
 typedef struct {
@@ -28,6 +31,10 @@ class Model {
 
 public:
     std::vector<Bone> bones;
+    std::map<std::string, unsigned int> boneIndexMapping; // maps a bone name to its index
+    std::vector<MeshEntries> meshEntries;
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
 
     explicit Model(const std::string& filePath);
 
