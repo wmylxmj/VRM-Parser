@@ -47,7 +47,7 @@ bool Model::BoneHasWeights(const aiBone *bone) {
 
 void Model::NodeProcessing(const aiNode *node, const aiScene *scene) {
     for (int i = 0; i < node->mNumMeshes; ++i) {
-        aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
+        const aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
         std::cout << "processing mesh " << mesh->mName.data << std::endl;
         std::pmr::vector<std::string> boneNames;
         for (int j = 0; j < mesh->mNumBones; ++j) {
