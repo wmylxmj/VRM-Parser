@@ -15,6 +15,9 @@
 typedef struct {
     float position[3];
     float normal[3];
+
+    // 骨骼索引和权重
+
 } Vertex;
 
 typedef struct {

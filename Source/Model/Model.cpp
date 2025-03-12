@@ -88,6 +88,8 @@ void Model::BoneProcessing(const aiBone *pBone, const MeshEntry &meshEntry) {
     for (unsigned int i = 0; i < pBone->mNumWeights; ++i) {
         if (pBone->mWeights[i].mWeight > 0) {
             boneHasWeights = true;
+            // 载入顶点的骨骼索引和权重
+
         }
     }
     // 如果是新的有效骨骼，那么添加
