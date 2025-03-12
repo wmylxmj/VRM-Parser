@@ -9,7 +9,6 @@
 #include <assimp/postprocess.h>
 
 #include <iostream>
-#include <cassert>
 #include <vector>
 
 Model::Model(const std::string& filePath) {
@@ -32,7 +31,7 @@ Model::Model(const std::string& filePath) {
 }
 
 void Model::SceneProcessing(const aiScene *pScene) {
-    for (int i = 0; i < pScene->mNumMeshes; ++i) {
+    for (unsigned int i = 0; i < pScene->mNumMeshes; ++i) {
         const aiMesh *pMesh = pScene->mMeshes[i];
         MeshProcessing(pMesh, pScene);
     }
@@ -44,6 +43,7 @@ void Model::SceneProcessing(const aiScene *pScene) {
     }
     std::cout << vertices.size() << std::endl;
     std::cout << indices.size() / 3 << std::endl;
+    std::cout << meshEntries.size() << std::endl;
 }
 
 void Model::MeshProcessing(const aiMesh *pMesh, const aiScene *pScene) {
@@ -67,21 +67,31 @@ void Model::MeshProcessing(const aiMesh *pMesh, const aiScene *pScene) {
     for(unsigned int i = 0; i < pMesh->mNumFaces; i++) {
         if (const aiFace face = pMesh->mFaces[i]; face.mNumIndices == 3) {
             for (unsigned int j = 0; j < face.mNumIndices; j++) {
-                indices.push_back(face.mIndices[j]);
+                indices.push_back(meshEntry.vertexBase + face.mIndices[j]);
                 meshEntry.numIndices ++;
             }
         }
     }
+    meshEntries.push_back(meshEntry);
     // 加载骨骼
-    for (int i = 0; i < pMesh->mNumBones; ++i) {
+    for (unsigned int i = 0; i < pMesh->mNumBones; ++i) {
         const aiBone *pBone = pMesh->mBones[i];
         BoneProcessing(pBone, pScene);
     }
 }
 
 void Model::BoneProcessing(const aiBone *pBone, const aiScene *pScene) {
-    if (!BoneHasWeights(pBone)) return;
-    if (const std::string boneName(pBone->mName.data); !boneIndexMapping.contains(boneName)) {
+    const std::string boneName(pBone->mName.data);
+    const unsigned int boneIndex = boneIndexMapping.contains(boneName) ? boneIndexMapping[boneName] : bones.size();
+
+    bool boneHasWeights = false; // 用于去除权重全为0的无效骨骼
+    for (unsigned int i = 0; i < pBone->mNumWeights; ++i) {
+        if (pBone->mWeights[i].mWeight > 0) {
+            boneHasWeights = true;
+        }
+    }
+    // 如果是新的有效骨骼，那么添加
+    if (boneHasWeights && boneIndex == bones.size()) {
         Bone bone;
         bone.parentIndex = INVALID_PARENT;
         boneIndexMapping[boneName] = bones.size();
@@ -98,17 +108,7 @@ void Model::NodeProcessing(const aiNode *pNode, const aiScene *pScene) {
         }
     }
     // 处理子节点
-    for (int i = 0; i < pNode->mNumChildren; ++i) {
+    for (unsigned int i = 0; i < pNode->mNumChildren; ++i) {
         NodeProcessing(pNode->mChildren[i], pScene);
     }
-}
-
-// 查看骨骼是否有不为0的权重，如果不是，则该骨骼无效
-bool Model::BoneHasWeights(const aiBone *pBone) {
-    for (int i = 0; i < pBone->mNumWeights; ++i) {
-        if (pBone->mWeights[i].mWeight > 0) {
-            return true;
-        }
-    }
-    return false;
 }

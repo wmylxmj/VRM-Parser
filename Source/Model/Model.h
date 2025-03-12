@@ -44,8 +44,6 @@ private:
     void MeshProcessing(const aiMesh *pMesh, const aiScene *pScene);
     void BoneProcessing(const aiBone *pBone, const aiScene *pScene);
 
-    static bool BoneHasWeights(const aiBone* pBone);
-
 protected:
     std::string m_directory;
 };
