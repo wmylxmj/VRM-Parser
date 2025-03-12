@@ -18,9 +18,9 @@ Model::Model(const std::string& filePath) {
                                    aiProcess_JoinIdenticalVertices |
                                    aiProcess_GenNormals;
 
-    const aiScene *scene = importer.ReadFile(filePath, flags);
+    const aiScene *pScene = importer.ReadFile(filePath, flags);
 
-    if (scene == nullptr) {
+    if (pScene == nullptr) {
         std::cerr << importer.GetErrorString() << std::endl;
         return;
     }
@@ -28,60 +28,60 @@ Model::Model(const std::string& filePath) {
     // 获得模型文件根目录
     m_directory = filePath.substr(0, filePath.find_last_of("/\\") + 1);
 
-    SceneProcessing(scene);
+    SceneProcessing(pScene);
 }
 
-void Model::SceneProcessing(const aiScene *scene) {
-    for (int i = 0; i < scene->mNumMeshes; ++i) {
-        const aiMesh *mesh = scene->mMeshes[i];
-        for (int j = 0; j < mesh->mNumBones; ++j) {
-            if (BoneHasWeights(mesh->mBones[j])) {
-                std::string boneName(mesh->mBones[j]->mName.data);
-                if (!boneIndexMapping.contains(boneName)) {
-                    Bone bone;
-                    bone.parentIndex = INVALID_PARENT;
-                    boneIndexMapping[boneName] = bones.size();
-                    bones.push_back(bone);
-                }
-            }
-        }
+void Model::SceneProcessing(const aiScene *pScene) {
+    for (int i = 0; i < pScene->mNumMeshes; ++i) {
+        const aiMesh *pMesh = pScene->mMeshes[i];
+        MeshProcessing(pMesh, pScene);
     }
-    NodeProcessing(scene->mRootNode, scene);
+    // 处理场景层次结构
+    NodeProcessing(pScene->mRootNode, pScene);
     std::cout << boneIndexMapping.size() << std::endl;
-    for (const auto& pair : boneIndexMapping) {
-        std::cout << pair.first << ": " << pair.second << "->" << bones[pair.second].parentIndex << std::endl;
+    for (const auto&[fst, snd] : boneIndexMapping) {
+        std::cout << fst << ": " << snd << "->" << bones[snd].parentIndex << std::endl;
     }
 }
 
-void Model::NodeProcessing(const aiNode *node, const aiScene *scene) {
-    std::string nodeName(node->mName.data);
-    if (boneIndexMapping.find(nodeName) != boneIndexMapping.end()) {
-        if (boneIndexMapping.find(node->mParent->mName.data) != boneIndexMapping.end())
-            bones[boneIndexMapping[nodeName]].parentIndex = boneIndexMapping[node->mParent->mName.data];
-        else {
-            std::cerr << "Node " << nodeName << " Parent " << node->mParent->mName.data << " not found" << std::endl;
-        }
+void Model::MeshProcessing(const aiMesh *pMesh, const aiScene *pScene) {
+    MeshEntry meshEntry;
+    meshEntry.vertexBase = vertices.size();
+    meshEntry.indexBase = indices.size();
+    for (int i = 0; i < pMesh->mNumBones; ++i) {
+        const aiBone *pBone = pMesh->mBones[i];
+        BoneProcessing(pBone, pScene);
     }
-    std::cout << "Node processing " << node->mName.data << std::endl;
-    std::cout << "Node Parent: " << (node->mParent == nullptr ? "" : node->mParent->mName.data) << std::endl;
-    for (int i = 0; i < node->mNumMeshes; ++i) {
-        const aiMesh *mesh = scene->mMeshes[node->mMeshes[i]];
-        for (int j = 0; j < mesh->mNumBones; ++j) {
-            if (BoneHasWeights(mesh->mBones[j])) {
-                std::cout << "Bone " << mesh->mBones[j]->mName.data << std::endl;
-            }
+}
+
+void Model::BoneProcessing(const aiBone *pBone, const aiScene *pScene) {
+    if (!BoneHasWeights(pBone)) return;
+    if (const std::string boneName(pBone->mName.data); !boneIndexMapping.contains(boneName)) {
+        Bone bone;
+        bone.parentIndex = INVALID_PARENT;
+        boneIndexMapping[boneName] = bones.size();
+        bones.push_back(bone);
+    }
+}
+
+void Model::NodeProcessing(const aiNode *pNode, const aiScene *pScene) {
+    if (const std::string nodeName(pNode->mName.data); boneIndexMapping.contains(nodeName)) {
+        if (boneIndexMapping.contains(pNode->mParent->mName.data))
+            bones[boneIndexMapping[nodeName]].parentIndex = boneIndexMapping[pNode->mParent->mName.data];
+        else {
+            std::cerr << "Node " << nodeName << " Parent " << pNode->mParent->mName.data << " not found" << std::endl;
         }
     }
     // 处理子节点
-    for (int i = 0; i < node->mNumChildren; ++i) {
-        NodeProcessing(node->mChildren[i], scene);
+    for (int i = 0; i < pNode->mNumChildren; ++i) {
+        NodeProcessing(pNode->mChildren[i], pScene);
     }
 }
 
 // 查看骨骼是否有不为0的权重，如果不是，则该骨骼无效
-bool Model::BoneHasWeights(const aiBone *bone) {
-    for (int i = 0; i < bone->mNumWeights; ++i) {
-        if (bone->mWeights[i].mWeight > 0) {
+bool Model::BoneHasWeights(const aiBone *pBone) {
+    for (int i = 0; i < pBone->mNumWeights; ++i) {
+        if (pBone->mWeights[i].mWeight > 0) {
             return true;
         }
     }
