@@ -76,11 +76,11 @@ void Model::MeshProcessing(const aiMesh *pMesh, const aiScene *pScene) {
     // 加载骨骼
     for (unsigned int i = 0; i < pMesh->mNumBones; ++i) {
         const aiBone *pBone = pMesh->mBones[i];
-        BoneProcessing(pBone, pScene);
+        BoneProcessing(pBone, meshEntry);
     }
 }
 
-void Model::BoneProcessing(const aiBone *pBone, const aiScene *pScene) {
+void Model::BoneProcessing(const aiBone *pBone, const MeshEntry &meshEntry) {
     const std::string boneName(pBone->mName.data);
     const unsigned int boneIndex = boneIndexMapping.contains(boneName) ? boneIndexMapping[boneName] : bones.size();
 

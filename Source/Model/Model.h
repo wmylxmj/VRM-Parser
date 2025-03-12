@@ -42,7 +42,7 @@ private:
     void SceneProcessing(const aiScene* pScene);
     void NodeProcessing(const aiNode *pNode, const aiScene *pScene);
     void MeshProcessing(const aiMesh *pMesh, const aiScene *pScene);
-    void BoneProcessing(const aiBone *pBone, const aiScene *pScene);
+    void BoneProcessing(const aiBone *pBone, const MeshEntry &meshEntry);
 
 protected:
     std::string m_directory;
