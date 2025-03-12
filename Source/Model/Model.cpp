@@ -42,12 +42,37 @@ void Model::SceneProcessing(const aiScene *pScene) {
     for (const auto&[fst, snd] : boneIndexMapping) {
         std::cout << fst << ": " << snd << "->" << bones[snd].parentIndex << std::endl;
     }
+    std::cout << vertices.size() << std::endl;
+    std::cout << indices.size() / 3 << std::endl;
 }
 
 void Model::MeshProcessing(const aiMesh *pMesh, const aiScene *pScene) {
+    // 网格入口初始化
     MeshEntry meshEntry;
     meshEntry.vertexBase = vertices.size();
     meshEntry.indexBase = indices.size();
+    meshEntry.numIndices = 0;
+    // 加载顶点
+    for (unsigned int i = 0; i < pMesh->mNumVertices; ++i) {
+        Vertex vertex;
+        vertex.position[0] = pMesh->mVertices[i].x;
+        vertex.position[1] = pMesh->mVertices[i].y;
+        vertex.position[2] = pMesh->mVertices[i].z;
+        vertex.normal[0] = pMesh->mNormals[i].x;
+        vertex.normal[1] = pMesh->mNormals[i].y;
+        vertex.normal[2] = pMesh->mNormals[i].z;
+        vertices.push_back(vertex);
+    }
+    // 加载三角形索引
+    for(unsigned int i = 0; i < pMesh->mNumFaces; i++) {
+        if (const aiFace face = pMesh->mFaces[i]; face.mNumIndices == 3) {
+            for (unsigned int j = 0; j < face.mNumIndices; j++) {
+                indices.push_back(face.mIndices[j]);
+                meshEntry.numIndices ++;
+            }
+        }
+    }
+    // 加载骨骼
     for (int i = 0; i < pMesh->mNumBones; ++i) {
         const aiBone *pBone = pMesh->mBones[i];
         BoneProcessing(pBone, pScene);
