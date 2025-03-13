@@ -21,7 +21,7 @@ typedef struct {
 
     // 骨骼索引和权重
     unsigned int boneIndices[NUM_BONES_PER_VERTEX];
-
+    float boneWeights[NUM_BONES_PER_VERTEX];
 } Vertex;
 
 typedef struct {
