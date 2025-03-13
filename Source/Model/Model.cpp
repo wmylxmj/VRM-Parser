@@ -103,10 +103,8 @@ void Model::BoneProcessing(const aiBone *pBone, const MeshEntry &meshEntry) {
 
 void Model::NodeProcessing(const aiNode *pNode, const aiScene *pScene) {
     if (const std::string nodeName(pNode->mName.data); boneIndexMapping.contains(nodeName)) {
-        if (boneIndexMapping.contains(pNode->mParent->mName.data))
+        if (boneIndexMapping.contains(pNode->mParent->mName.data)) {
             bones[boneIndexMapping[nodeName]].parentIndex = boneIndexMapping[pNode->mParent->mName.data];
-        else {
-            std::cerr << "Node " << nodeName << " Parent " << pNode->mParent->mName.data << " not found" << std::endl;
         }
     }
     // 处理子节点
