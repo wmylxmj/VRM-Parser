@@ -61,6 +61,11 @@ void Model::MeshProcessing(const aiMesh *pMesh, const aiScene *pScene) {
         vertex.normal.x = pMesh->mNormals[i].x;
         vertex.normal.y = pMesh->mNormals[i].y;
         vertex.normal.z = pMesh->mNormals[i].z;
+        // 骨骼数据初始化
+        for (unsigned int j = 0; j < NUM_BONES_PER_VERTEX; ++j) {
+            vertex.boneIndices[j] = 0;
+            vertex.boneWeights[j] = 0.0f;
+        }
         vertices.push_back(vertex);
     }
     // 加载三角形索引
@@ -88,10 +93,30 @@ void Model::BoneProcessing(const aiBone *pBone, const MeshEntry &meshEntry) {
     for (unsigned int i = 0; i < pBone->mNumWeights; ++i) {
         if (pBone->mWeights[i].mWeight > 0) {
             boneHasWeights = true;
-            // 载入顶点的骨骼索引和权重
 
+            // 载入顶点的骨骼索引和权重
+            const unsigned int vertexIndex = meshEntry.vertexBase + pBone->mWeights[i].mVertexId;
+            // 查找空的插槽
+            unsigned int slot = 0;
+            float minWeight = std::numeric_limits<float>::max();
+            for (int j = 0; j < NUM_BONES_PER_VERTEX; ++j) {
+                // 如果有空位
+                if (vertices[vertexIndex].boneWeights[j] == 0) {
+                    slot = j;
+                    break;
+                }
+                // 如果没有空位，替换最小权重的槽位
+                if (vertices[vertexIndex].boneWeights[j] < minWeight) {
+                    minWeight = vertices[vertexIndex].boneWeights[j];
+                    slot = j;
+                }
+            }
+            // 分配骨骼索引和权重
+            vertices[vertexIndex].boneIndices[slot] = boneIndex;
+            vertices[vertexIndex].boneWeights[slot] = pBone->mWeights[i].mWeight;
         }
     }
+
     // 如果是新的有效骨骼，那么添加
     if (boneHasWeights && boneIndex == bones.size()) {
         Bone bone;
