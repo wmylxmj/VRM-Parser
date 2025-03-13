@@ -31,19 +31,26 @@ Model::Model(const std::string& filePath) {
 }
 
 void Model::SceneProcessing(const aiScene *pScene) {
+    // 处理网格
     for (unsigned int i = 0; i < pScene->mNumMeshes; ++i) {
         const aiMesh *pMesh = pScene->mMeshes[i];
         MeshProcessing(pMesh, pScene);
     }
     // 处理场景层次结构
     NodeProcessing(pScene->mRootNode, pScene);
-    std::cout << boneIndexMapping.size() << std::endl;
-    for (const auto&[fst, snd] : boneIndexMapping) {
-        std::cout << fst << ": " << snd << "->" << bones[snd].parentIndex << std::endl;
+
+    // 后处理：归一化顶点骨骼权重
+    for (unsigned int i = 0; i < vertices.size(); ++i) {
+        float totalWeight = 0.0f;
+        for (const float boneWeight : vertices[i].boneWeights) {
+            totalWeight += boneWeight;
+        }
+        if (totalWeight > 0) {
+            for (float & boneWeight : vertices[i].boneWeights) {
+                boneWeight /= totalWeight;
+            }
+        }
     }
-    std::cout << vertices.size() << std::endl;
-    std::cout << indices.size() / 3 << std::endl;
-    std::cout << meshEntries.size() << std::endl;
 }
 
 void Model::MeshProcessing(const aiMesh *pMesh, const aiScene *pScene) {
