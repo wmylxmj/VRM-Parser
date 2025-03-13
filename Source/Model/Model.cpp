@@ -99,9 +99,11 @@ void Model::BoneProcessing(const aiBone *pBone, const MeshEntry &meshEntry) {
             // 查找空的插槽
             unsigned int slot = 0;
             float minWeight = std::numeric_limits<float>::max();
+            bool exceedingBoneCountWarning = true;
             for (int j = 0; j < NUM_BONES_PER_VERTEX; ++j) {
                 // 如果有空位
                 if (vertices[vertexIndex].boneWeights[j] == 0) {
+                    exceedingBoneCountWarning = false;
                     slot = j;
                     break;
                 }
@@ -110,6 +112,9 @@ void Model::BoneProcessing(const aiBone *pBone, const MeshEntry &meshEntry) {
                     minWeight = vertices[vertexIndex].boneWeights[j];
                     slot = j;
                 }
+            }
+            if (exceedingBoneCountWarning) {
+                std::cerr << "Warning: Vertex " << vertexIndex << "Has Too Many Bones" << std::endl;
             }
             // 分配骨骼索引和权重
             vertices[vertexIndex].boneIndices[slot] = boneIndex;
