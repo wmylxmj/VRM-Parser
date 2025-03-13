@@ -55,12 +55,12 @@ void Model::MeshProcessing(const aiMesh *pMesh, const aiScene *pScene) {
     // 加载顶点
     for (unsigned int i = 0; i < pMesh->mNumVertices; ++i) {
         Vertex vertex;
-        vertex.position[0] = pMesh->mVertices[i].x;
-        vertex.position[1] = pMesh->mVertices[i].y;
-        vertex.position[2] = pMesh->mVertices[i].z;
-        vertex.normal[0] = pMesh->mNormals[i].x;
-        vertex.normal[1] = pMesh->mNormals[i].y;
-        vertex.normal[2] = pMesh->mNormals[i].z;
+        vertex.position.x = pMesh->mVertices[i].x;
+        vertex.position.y = pMesh->mVertices[i].y;
+        vertex.position.z = pMesh->mVertices[i].z;
+        vertex.normal.x = pMesh->mNormals[i].x;
+        vertex.normal.y = pMesh->mNormals[i].y;
+        vertex.normal.z = pMesh->mNormals[i].z;
         vertices.push_back(vertex);
     }
     // 加载三角形索引

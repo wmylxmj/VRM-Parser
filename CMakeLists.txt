@@ -11,3 +11,6 @@ add_executable(VRM_Parser Source/main.cpp
 
 find_package(assimp CONFIG REQUIRED)
 target_link_libraries(VRM_Parser PRIVATE assimp::assimp)
+
+find_package(glm CONFIG REQUIRED)
+target_link_libraries(VRM_Parser PRIVATE glm::glm)

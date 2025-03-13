@@ -9,12 +9,13 @@
 #include <map>
 
 #include "assimp/scene.h"
+#include "glm/glm.hpp"
 
 #define INVALID_PARENT 0XFFFFFFFF
 
 typedef struct {
-    float position[3];
-    float normal[3];
+    glm::vec3 position;
+    glm::vec3 normal;
 
     // 骨骼索引和权重
 
