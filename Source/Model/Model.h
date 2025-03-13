@@ -11,6 +11,8 @@
 #include "assimp/scene.h"
 #include "glm/glm.hpp"
 
+#define NUM_BONES_PER_VERTEX 4
+
 #define INVALID_PARENT 0XFFFFFFFF
 
 typedef struct {
@@ -18,6 +20,7 @@ typedef struct {
     glm::vec3 normal;
 
     // 骨骼索引和权重
+    unsigned int boneIndices[NUM_BONES_PER_VERTEX];
 
 } Vertex;
 
