@@ -10,7 +10,7 @@ int main() {
     std::cout << "Num Triangle Faces: " << model.indices.size() / 3 << std::endl;
     std::cout << "Num Meshes: " << model.meshEntries.size() << std::endl;
     std::cout << "Num Bones: " << model.bones.size() << std::endl;
-    std::cout << "Bone Bone Hierarchy: " << std::endl;
+    std::cout << "Bone Hierarchy: " << std::endl;
     for (auto &[fst, snd] : model.boneIndexMapping) {
         std::cout << fst << ": " << snd << "->" << model.bones[snd].parentIndex <<  std::endl;
     }
