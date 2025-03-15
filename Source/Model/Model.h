@@ -26,6 +26,7 @@ typedef struct {
 
 typedef struct {
     unsigned int parentIndex;
+    glm::mat4 offsetMatrix;
 } Bone;
 
 typedef struct {

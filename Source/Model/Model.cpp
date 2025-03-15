@@ -133,6 +133,8 @@ void Model::BoneProcessing(const aiBone *pBone, const MeshEntry &meshEntry) {
     if (boneHasWeights && boneIndex == bones.size()) {
         Bone bone;
         bone.parentIndex = INVALID_PARENT;
+        memcpy(&bone.offsetMatrix, &pBone->mOffsetMatrix.a1, sizeof(aiMatrix4x4));
+        bone.offsetMatrix = glm::transpose(bone.offsetMatrix);
         boneIndexMapping[boneName] = bones.size();
         bones.push_back(bone);
     }
@@ -149,3 +151,4 @@ void Model::NodeProcessing(const aiNode *pNode, const aiScene *pScene) {
         NodeProcessing(pNode->mChildren[i], pScene);
     }
 }
+
