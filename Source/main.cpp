@@ -1,9 +1,18 @@
 #include <iostream>
 
 #include "Core/PrecompiledHeader.h"
+#include "Core/IApplication.h"
 #include "Model/VrmModel.h"
 
-int main() {
+class MainApp final : public IApplication {
+
+public:
+    void OnInit() override;
+    void OnUpdate() override;
+    void OnRender() override;
+};
+
+void MainApp::OnInit() {
     std::cout << "Loading Model..." << std::endl;
     VrmModel model(R"(E:\vrm\20220331_1455\20220331_1455\base body\black cat base body v3.5.0.vrm)");
     std::cout << "Model Loaded." << std::endl;
@@ -15,5 +24,17 @@ int main() {
     for (auto &[fst, snd] : model.boneIndexMapping) {
         std::cout << fst << ": " << snd << "->" << model.bones[snd].parentIndex <<  std::endl;
     }
-    return 0;
+}
+
+void MainApp::OnUpdate() {
+
+}
+
+void MainApp::OnRender() {
+
+}
+
+int main() {
+    MainApp app;
+    return app.Run();
 }
