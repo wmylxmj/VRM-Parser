@@ -14,3 +14,9 @@ target_link_libraries(VRM_Parser PRIVATE assimp::assimp)
 
 find_package(glm CONFIG REQUIRED)
 target_link_libraries(VRM_Parser PRIVATE glm::glm)
+
+find_package(glad CONFIG REQUIRED)
+target_link_libraries(VRM_Parser PRIVATE glad::glad)
+
+find_package(glfw3 CONFIG REQUIRED)
+target_link_libraries(VRM_Parser PRIVATE glfw)
