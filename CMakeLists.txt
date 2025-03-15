@@ -10,7 +10,9 @@ add_executable(VRM_Parser Source/main.cpp
         Source/Model/VrmModel.h
         Source/Core/PrecompiledHeader.h
         Source/Core/IApplication.cpp
-        Source/Core/IApplication.h)
+        Source/Core/IApplication.h
+        Source/Core/Camera.cpp
+        Source/Core/Camera.h)
 
 find_package(assimp CONFIG REQUIRED)
 target_link_libraries(VRM_Parser PRIVATE assimp::assimp)
