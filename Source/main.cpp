@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "Core/PrecompiledHeader.h"
 #include "Model/VrmModel.h"
 
 int main() {
