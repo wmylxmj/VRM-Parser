@@ -6,6 +6,12 @@
 
 #include <iostream>
 
+#ifdef RELEASE
+
+#define GL_CHECK_ERRORS(x) x;
+
+#else
+
 #define GL_CHECK_ERRORS(x) { \
     x; \
     GLenum GL_CHECK_ERRORS_errorCode; \
@@ -26,5 +32,6 @@
     } \
 }
 
+#endif
 
 
