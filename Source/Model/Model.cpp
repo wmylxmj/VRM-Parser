@@ -148,6 +148,7 @@ void Model::NodeProcessing(const aiNode *pNode, glm::mat4 rootTransformation, un
         bones[boneIndexMapping[nodeName]].parentIndex = parentIndex;
         memcpy(&bones[boneIndexMapping[nodeName]].transformation, &pNode->mTransformation.a1, sizeof(aiMatrix4x4));
         bones[boneIndexMapping[nodeName]].transformation = glm::inverse(bones[boneIndexMapping[nodeName]].transformation);
+        // 更新父索引
         parentIndex = boneIndexMapping[nodeName];
     }
     // 否则更新骨骼的根变换
