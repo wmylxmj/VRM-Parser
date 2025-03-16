@@ -11,6 +11,7 @@
 #include <iostream>
 #include <vector>
 
+
 Model::Model(const std::string& filePath) {
     Assimp::Importer importer;
     constexpr unsigned int flags = aiProcess_Triangulate |
@@ -37,7 +38,7 @@ void Model::SceneProcessing(const aiScene *pScene) {
         MeshProcessing(pMesh, pScene);
     }
     // 处理场景层次结构
-    NodeProcessing(pScene->mRootNode, pScene);
+    NodeProcessing(pScene->mRootNode);
 
     // 后处理：归一化顶点骨骼权重
     for (unsigned int i = 0; i < vertices.size(); ++i) {
@@ -142,15 +143,22 @@ void Model::BoneProcessing(const aiBone *pBone, const MeshEntry &meshEntry) {
     }
 }
 
-void Model::NodeProcessing(const aiNode *pNode, const aiScene *pScene) {
+void Model::NodeProcessing(const aiNode *pNode, glm::mat4 rootTransformation, unsigned int parentIndex) {
+    // 如果该节点是骨骼节点，更新父索引
     if (const std::string nodeName(pNode->mName.data); boneIndexMapping.contains(nodeName)) {
-        if (boneIndexMapping.contains(pNode->mParent->mName.data)) {
-            bones[boneIndexMapping[nodeName]].parentIndex = boneIndexMapping[pNode->mParent->mName.data];
-        }
+        bones[boneIndexMapping[nodeName]].parentIndex = parentIndex;
+        parentIndex = boneIndexMapping[nodeName];
+    }
+    // 否则更新骨骼的根变换
+    else {
+        glm::mat4 nodeTransformation;
+        memcpy(&nodeTransformation, &pNode->mTransformation, sizeof(aiMatrix4x4));
+        nodeTransformation = glm::inverse(nodeTransformation);
+        rootTransformation = rootTransformation * nodeTransformation;
     }
     // 处理子节点
     for (unsigned int i = 0; i < pNode->mNumChildren; ++i) {
-        NodeProcessing(pNode->mChildren[i], pScene);
+        NodeProcessing(pNode->mChildren[i], rootTransformation, parentIndex);
     }
 }
 

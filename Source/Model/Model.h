@@ -50,7 +50,7 @@ public:
 
 private:
     void SceneProcessing(const aiScene* pScene);
-    void NodeProcessing(const aiNode *pNode, const aiScene *pScene);
+    void NodeProcessing(const aiNode *pNode, glm::mat4 rootTransformation = glm::mat4(1.0f), unsigned int parentIndex = INVALID_PARENT);
     void MeshProcessing(const aiMesh *pMesh, const aiScene *pScene);
     void BoneProcessing(const aiBone *pBone, const MeshEntry &meshEntry);
 
