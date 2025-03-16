@@ -17,7 +17,7 @@ public:
     float fovY = glm::radians(60.0f);
     float aspect = 16.0 / 9;
     float zNear = 0.1f;
-    float zFar = 100.0f;
+    float zFar = 1000.0f;
 
     void RotateXY(float dThetaX, float dThetaY);
     [[nodiscard]] glm::mat4 GetPerspectiveMatrix() const;

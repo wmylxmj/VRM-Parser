@@ -136,6 +136,7 @@ void Model::BoneProcessing(const aiBone *pBone, const MeshEntry &meshEntry) {
         bone.parentIndex = INVALID_PARENT;
         memcpy(&bone.offsetMatrix, &pBone->mOffsetMatrix.a1, sizeof(aiMatrix4x4));
         bone.offsetMatrix = glm::transpose(bone.offsetMatrix);
+        bone.transformation = glm::inverse(bone.offsetMatrix); // 绑定姿势
         boneIndexMapping[boneName] = bones.size();
         bones.push_back(bone);
     }
