@@ -42,4 +42,3 @@ class ShaderProgram : public Shader {
 public:
     ShaderProgram(const char *pVertexShaderFile, const char *pFragmentShaderFile);
 };
-

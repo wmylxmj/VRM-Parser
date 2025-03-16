@@ -6,7 +6,7 @@
 
 #include <memory>
 
-VertexShader::VertexShader(const char *pFile) {
+VertexShader::VertexShader(const char *pFile) : Shader() {
     std::string code;
     std::ifstream file;
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -32,7 +32,7 @@ VertexShader::VertexShader(const char *pFile) {
         GLint logLength;
         glGetShaderiv(glID, GL_INFO_LOG_LENGTH, &logLength);
 
-        GLchar* infoLog = (GLchar*)alloca(logLength * sizeof(GLchar));
+        auto* infoLog = static_cast<GLchar *>(alloca(logLength * sizeof(GLchar)));
         glGetShaderInfoLog(glID, logLength, nullptr, infoLog);
         std::cout << infoLog << std::endl;
     }
@@ -42,7 +42,7 @@ VertexShader::~VertexShader() {
     glDeleteShader(glID);
 }
 
-FragmentShader::FragmentShader(const char *pFile) {
+FragmentShader::FragmentShader(const char *pFile) : Shader() {
     std::string code;
     std::ifstream file;
     file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -67,7 +67,7 @@ FragmentShader::FragmentShader(const char *pFile) {
         GLint logLength;
         glGetShaderiv(glID, GL_INFO_LOG_LENGTH, &logLength);
 
-        GLchar* infoLog = (GLchar*)alloca(logLength * sizeof(GLchar));
+        auto* infoLog = static_cast<GLchar *>(alloca(logLength * sizeof(GLchar)));
         glGetShaderInfoLog(glID, logLength, nullptr, infoLog);
         std::cout << infoLog << std::endl;
     }
@@ -77,9 +77,9 @@ FragmentShader::~FragmentShader() {
     glDeleteShader(glID);
 }
 
-ShaderProgram::ShaderProgram(const char *pVertexShaderFile, const char *pFragmentShaderFile) {
-    VertexShader vertexShader(pVertexShaderFile);
-    FragmentShader fragmentShader(pFragmentShaderFile);
+ShaderProgram::ShaderProgram(const char *pVertexShaderFile, const char *pFragmentShaderFile) : Shader() {
+    const VertexShader vertexShader(pVertexShaderFile);
+    const FragmentShader fragmentShader(pFragmentShaderFile);
     glID = glCreateProgram();
     glAttachShader(glID, vertexShader.glID);
     glAttachShader(glID, fragmentShader.glID);
@@ -91,7 +91,7 @@ ShaderProgram::ShaderProgram(const char *pVertexShaderFile, const char *pFragmen
         GLint logLength;
         glGetProgramiv(glID, GL_INFO_LOG_LENGTH, &logLength);
 
-        GLchar* infoLog = (GLchar*)alloca(logLength * sizeof(GLchar));
+        auto* infoLog = static_cast<GLchar *>(alloca(logLength * sizeof(GLchar)));
         glGetProgramInfoLog(glID, logLength, nullptr, infoLog);
         std::cout << infoLog << std::endl;
     }
