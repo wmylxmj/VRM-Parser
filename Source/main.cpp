@@ -22,7 +22,12 @@ void MainApp::OnInit() {
     std::cout << "Num Bones: " << model.bones.size() << std::endl;
     std::cout << "Bone Hierarchy: " << std::endl;
     for (auto &[fst, snd] : model.boneIndexMapping) {
-        std::cout << fst << ": " << snd << "->" << model.bones[snd].parentIndex <<  std::endl;
+        if (model.bones[snd].parentIndex != INVALID_PARENT) {
+            std::cout << fst << "->" << model.bones[model.bones[snd].parentIndex].name <<  std::endl;
+        }
+        else {
+            std::cout << fst << "->" << "null" <<  std::endl;
+        }
     }
 }
 

@@ -25,8 +25,10 @@ typedef struct {
 } Vertex;
 
 typedef struct {
+    std::string name;
     unsigned int parentIndex;
     glm::mat4 offsetMatrix;
+    glm::mat4 transformation;
 } Bone;
 
 typedef struct {

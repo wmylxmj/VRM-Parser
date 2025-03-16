@@ -132,6 +132,7 @@ void Model::BoneProcessing(const aiBone *pBone, const MeshEntry &meshEntry) {
     // 如果是新的有效骨骼，那么添加
     if (boneHasWeights && boneIndex == bones.size()) {
         Bone bone;
+        bone.name = boneName;
         bone.parentIndex = INVALID_PARENT;
         memcpy(&bone.offsetMatrix, &pBone->mOffsetMatrix.a1, sizeof(aiMatrix4x4));
         bone.offsetMatrix = glm::transpose(bone.offsetMatrix);
