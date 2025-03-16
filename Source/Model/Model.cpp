@@ -137,7 +137,6 @@ void Model::BoneProcessing(const aiBone *pBone, const MeshEntry &meshEntry) {
         bone.parentIndex = INVALID_PARENT;
         memcpy(&bone.offsetMatrix, &pBone->mOffsetMatrix.a1, sizeof(aiMatrix4x4));
         bone.offsetMatrix = glm::transpose(bone.offsetMatrix);
-        bone.transformation = glm::inverse(bone.offsetMatrix); // 绑定姿势
         boneIndexMapping[boneName] = bones.size();
         bones.push_back(bone);
     }
@@ -147,6 +146,8 @@ void Model::NodeProcessing(const aiNode *pNode, glm::mat4 rootTransformation, un
     // 如果该节点是骨骼节点，更新父索引
     if (const std::string nodeName(pNode->mName.data); boneIndexMapping.contains(nodeName)) {
         bones[boneIndexMapping[nodeName]].parentIndex = parentIndex;
+        memcpy(&bones[boneIndexMapping[nodeName]].transformation, &pNode->mTransformation.a1, sizeof(aiMatrix4x4));
+        bones[boneIndexMapping[nodeName]].transformation = glm::inverse(bones[boneIndexMapping[nodeName]].transformation);
         parentIndex = boneIndexMapping[nodeName];
     }
     // 否则更新骨骼的根变换
