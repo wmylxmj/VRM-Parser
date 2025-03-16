@@ -19,7 +19,7 @@
     while ((GL_CHECK_ERRORS_errorCode = glGetError()) != GL_NO_ERROR) \
     { \
         std::string GL_CHECK_ERRORS_errorString; \
-        switch (errorCode) \
+        switch (GL_CHECK_ERRORS_errorCode) \
         { \
             case GL_INVALID_ENUM:                  GL_CHECK_ERRORS_errorString = "INVALID_ENUM"; break; \
             case GL_INVALID_VALUE:                 GL_CHECK_ERRORS_errorString = "INVALID_VALUE"; break; \
