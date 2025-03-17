@@ -2,7 +2,7 @@
 // Created by 13973 on 25-3-15.
 //
 
-# include "PrecompiledHeader.h"
+#include "PrecompiledHeader.h"
 #include "IApplication.h"
 
 int IApplication::MakeContextCurrent(GLFWwindow *window) {
