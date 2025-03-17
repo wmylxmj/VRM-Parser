@@ -86,7 +86,7 @@ ShaderProgram::ShaderProgram(const char *pVertexShaderFile, const char *pFragmen
     glLinkProgram(glID);
 
     GLint success;
-    glGetProgramiv(glID, GL_COMPILE_STATUS, &success);
+    glGetProgramiv(glID, GL_LINK_STATUS, &success);
     if(!success) {
         GLint logLength;
         glGetProgramiv(glID, GL_INFO_LOG_LENGTH, &logLength);
