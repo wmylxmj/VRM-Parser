@@ -13,7 +13,7 @@ public:
     GLFWwindow* window;
     Camera camera;
     std::unique_ptr<ShaderProgram> pShader;
-    std::vector<Model> models;
+    std::unique_ptr<Model> pModel;
     GLuint vao, vbo, ebo;
 
     bool LoopCondition() override { return !glfwWindowShouldClose(window); }
@@ -21,7 +21,6 @@ public:
     void OnUpdate() override;
     void OnRender() override;
 };
-
 
 void SetUpModelToGL(const Model& model, GLuint &vao,GLuint &vbo, GLuint &ebo) {
     // 创建缓冲区对象
@@ -58,15 +57,14 @@ void SetUpModelToGL(const Model& model, GLuint &vao,GLuint &vbo, GLuint &ebo) {
 
 void MainApp::OnInit() {
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GL_TRUE);
-    window = glfwCreateWindow(800, 600, "Vrm Parser", nullptr, nullptr);
+    window = glfwCreateWindow(1024, 1024, "Vrm Parser", nullptr, nullptr);
     MakeContextCurrent(window);
 
     glEnable(GL_DEPTH_TEST);
     // 导入模型
-    VrmModel model(R"(E:\vrm\20220331_1455\20220331_1455\base body\black cat base body v3.5.0.vrm)");
-    std::cout << "Model size: " << model.vertices.size() << std::endl;
+    pModel = std::make_unique<VrmModel>(R"(E:\vrm\20220331_1455\20220331_1455\base body\black cat base body v3.5.0.vrm)");
     // 模型上传
-    GL_CHECK_ERRORS(SetUpModelToGL(model, vao, vbo, ebo));
+    GL_CHECK_ERRORS(SetUpModelToGL(*pModel, vao, vbo, ebo));
 
     float xMin = FLT_MAX;
     float xMax = -FLT_MAX;
@@ -74,7 +72,7 @@ void MainApp::OnInit() {
     float yMax = -FLT_MAX;
     float zMin = FLT_MAX;
     float zMax = -FLT_MAX;
-    for (auto vertex: model.vertices) {
+    for (auto vertex: pModel->vertices) {
         if (vertex.position.x < xMin) xMin = vertex.position.x;
         if (vertex.position.x > xMax) xMax = vertex.position.x;
         if (vertex.position.y < yMin) yMin = vertex.position.y;
@@ -83,16 +81,7 @@ void MainApp::OnInit() {
         if (vertex.position.z > zMax) zMax = vertex.position.z;
     }
 
-    models.emplace_back(std::move(model));
-
-    std::cout << "xMin: " << xMin << std::endl;
-    std::cout << "xMax: " << xMax << std::endl;
-    std::cout << "yMin: " << yMin << std::endl;
-    std::cout << "yMax: " << yMax << std::endl;
-    std::cout << "zMin: " << zMin << std::endl;
-    std::cout << "zMax: " << zMax << std::endl;
-
-    camera.eyePosition = glm::vec3(0.5*(xMax+xMin), 0.7*(yMin+yMax), zMax+std::max(zMax-zMin, std::max(xMax-xMin, yMax-yMin)));
+    camera.eyePosition = glm::vec3(0.5*(xMax+xMin), 0.5*(yMin+yMax), zMax+std::max(zMax-zMin, std::max(xMax-xMin, yMax-yMin)));
 
     pShader = std::make_unique<ShaderProgram>(R"(E:\VRM-Parser\Source\Shaders\Shader.vsh)", R"(E:\VRM-Parser\Source\Shaders\Shader.fsh)");
     GL_CHECK_ERRORS();
@@ -114,7 +103,7 @@ void MainApp::OnRender() {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    const Model model = models.at(0);
+    const Model model = *pModel;
     GL_CHECK_ERRORS(glBindVertexArray(vao));
     GL_CHECK_ERRORS(glDrawElements(GL_TRIANGLES, model.indices.size(), GL_UNSIGNED_INT, nullptr));
     glBindVertexArray(0);
