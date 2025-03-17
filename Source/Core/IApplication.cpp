@@ -10,24 +10,24 @@ int IApplication::Run() {
         return -1;
     }
 
-    // 设置背景可透明
-    glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GLFW_TRUE);
+    // 窗口设置
+    SetWindowHints();
 
+    // 创建窗口
     GLFWwindow *glfwWindow = glfwCreateWindow(1024, 1024, "", nullptr, nullptr);
     if (!glfwWindow) {
         glfwTerminate();
         return -1;
     }
 
+    // 创建上下文
     glfwMakeContextCurrent(glfwWindow);
 
+    // 初始化glad
     if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
         glfwTerminate();
         return -1;
     }
-
-    // 设置输入模式
-    glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     // 初始化场景
     OnInit();
