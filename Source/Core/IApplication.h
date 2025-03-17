@@ -9,7 +9,8 @@ class IApplication {
 public:
     virtual ~IApplication() = default;
 
-    virtual void SetWindowHints() {}
+    static int MakeContextCurrent(GLFWwindow *window);
+    virtual bool LoopCondition() { return false; }
 
     virtual void OnInit() = 0;
     virtual void OnUpdate() = 0;

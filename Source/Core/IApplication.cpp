@@ -5,40 +5,27 @@
 # include "PrecompiledHeader.h"
 #include "IApplication.h"
 
+int IApplication::MakeContextCurrent(GLFWwindow *window) {
+    // 创建当前上下文
+    glfwMakeContextCurrent(window);
+    // 从上下文中加载函数指针
+    return gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+}
+
 int IApplication::Run() {
+    // 初始化glfw
     if (!glfwInit()) {
-        return -1;
-    }
-
-    // 窗口设置
-    SetWindowHints();
-
-    // 创建窗口
-    GLFWwindow *glfwWindow = glfwCreateWindow(1024, 1024, "", nullptr, nullptr);
-    if (!glfwWindow) {
-        glfwTerminate();
-        return -1;
-    }
-
-    // 创建上下文
-    glfwMakeContextCurrent(glfwWindow);
-
-    // 初始化glad
-    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress))) {
-        glfwTerminate();
         return -1;
     }
 
     // 初始化场景
     OnInit();
 
-    while(!glfwWindowShouldClose(glfwWindow)) {
+    while(LoopCondition()) {
         // 更新逻辑帧
         OnUpdate();
         // 渲染
         OnRender();
-        // 交换帧缓冲
-        glfwSwapBuffers(glfwWindow);
         // 处理窗口事件
         glfwPollEvents();
     }
