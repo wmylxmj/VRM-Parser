@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include <queue>
 
 #include "Core/Camera.h"
 #include "Core/PrecompiledHeader.h"
@@ -55,6 +56,60 @@ void SetUpModelToGL(const Model& model, GLuint &vao,GLuint &vbo, GLuint &ebo) {
     glBindVertexArray(0);
 }
 
+
+
+std::vector<glm::mat4> GetBonesFinalTransformations(const Model& model) {
+    // 缓存，避免重复计算
+    std::vector<glm::mat4> finalTransformations(model.bones.size());
+    std::vector<glm::mat4> globalTransformations(model.bones.size());
+    std::vector<bool> bonesCalculated(model.bones.size(), false);
+
+    for (int i = 0; i < model.bones.size(); i++) {
+        // 如果已计算，则跳过
+        if (bonesCalculated[i]) continue;
+
+        Bone bone(model.bones[i]);
+
+        unsigned int parentIndex = bone.parentIndex;
+        std::queue<unsigned int> parentChain;
+
+        // 溯源到已计算的父节点或根节点
+        while (parentIndex != INVALID_PARENT && !bonesCalculated[parentIndex]) {
+            parentChain.push(parentIndex);
+            parentIndex = model.bones[parentIndex].parentIndex;
+        }
+
+        while (!parentChain.empty()) {
+            parentIndex = parentChain.front();
+            parentChain.pop();
+
+            Bone parentBone = model.bones[parentIndex];
+
+            if (parentBone.parentIndex == INVALID_PARENT) {
+                globalTransformations[parentIndex] = bone.transformation;
+            }
+            else {
+                globalTransformations[parentIndex] = globalTransformations[parentBone.parentIndex] * bone.transformation;
+            }
+            finalTransformations[parentIndex] = globalTransformations[parentIndex] * parentBone.offsetMatrix;
+            bonesCalculated[parentIndex] = true;
+        }
+
+        // 计算当前骨骼变换矩阵
+        if (bone.parentIndex == INVALID_PARENT) {
+            globalTransformations[i] = bone.transformation;
+        }
+        else {
+            globalTransformations[i] = globalTransformations[bone.parentIndex] * bone.transformation;
+
+        }
+        finalTransformations[i] = bone.transformation * bone.offsetMatrix;
+        bonesCalculated[i] = true;
+    }
+
+    return finalTransformations;
+}
+
 void MainApp::OnInit() {
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GL_TRUE);
     window = glfwCreateWindow(1024, 1024, "Vrm Parser", nullptr, nullptr);
@@ -65,6 +120,7 @@ void MainApp::OnInit() {
     pModel = std::make_unique<VrmModel>(R"(E:\vrm\20220331_1455\20220331_1455\base body\black cat base body v3.5.0.vrm)");
     // 模型上传
     GL_CHECK_ERRORS(SetUpModelToGL(*pModel, vao, vbo, ebo));
+    std::vector<glm::mat4> finalTransformations = GetBonesFinalTransformations(*pModel);
 
     float xMin = FLT_MAX;
     float xMax = -FLT_MAX;
