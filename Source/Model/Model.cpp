@@ -143,19 +143,20 @@ void Model::BoneProcessing(const aiBone *pBone, const MeshEntry &meshEntry) {
 }
 
 void Model::NodeProcessing(const aiNode *pNode, glm::mat4 rootTransformation, unsigned int parentIndex) {
+    // 当前的节点变换
+    glm::mat4 nodeTransformation;
+    memcpy(&nodeTransformation, &pNode->mTransformation, sizeof(aiMatrix4x4));
+    nodeTransformation = glm::inverse(nodeTransformation);
     // 如果该节点是骨骼节点，更新父索引
     if (const std::string nodeName(pNode->mName.data); boneIndexMapping.contains(nodeName)) {
         bones[boneIndexMapping[nodeName]].parentIndex = parentIndex;
-        memcpy(&bones[boneIndexMapping[nodeName]].transformation, &pNode->mTransformation.a1, sizeof(aiMatrix4x4));
-        bones[boneIndexMapping[nodeName]].transformation = glm::inverse(bones[boneIndexMapping[nodeName]].transformation);
+        bones[boneIndexMapping[nodeName]].transformation = rootTransformation * nodeTransformation;
         // 更新父索引
         parentIndex = boneIndexMapping[nodeName];
+        rootTransformation = glm::mat4(1.0f);
     }
     // 否则更新骨骼的根变换
     else {
-        glm::mat4 nodeTransformation;
-        memcpy(&nodeTransformation, &pNode->mTransformation, sizeof(aiMatrix4x4));
-        nodeTransformation = glm::inverse(nodeTransformation);
         rootTransformation = rootTransformation * nodeTransformation;
     }
     // 处理子节点
