@@ -101,9 +101,8 @@ std::vector<glm::mat4> GetBonesFinalTransformations(const Model& model) {
         }
         else {
             globalTransformations[i] = globalTransformations[bone.parentIndex] * bone.transformation;
-
         }
-        finalTransformations[i] = bone.transformation * bone.offsetMatrix;
+        finalTransformations[i] = globalTransformations[i] * bone.offsetMatrix;
         bonesCalculated[i] = true;
     }
 
