@@ -1,6 +1,8 @@
 #include <iostream>
 #include <memory>
 #include <queue>
+#include <cassert>
+#include <stack>
 
 #include "Core/Camera.h"
 #include "Core/PrecompiledHeader.h"
@@ -71,7 +73,7 @@ std::vector<glm::mat4> GetBonesFinalTransformations(const Model& model) {
         Bone bone(model.bones[i]);
 
         unsigned int parentIndex = bone.parentIndex;
-        std::queue<unsigned int> parentChain;
+        std::stack<unsigned int> parentChain;
 
         // 溯源到已计算的父节点或根节点
         while (parentIndex != INVALID_PARENT && !bonesCalculated[parentIndex]) {
@@ -80,7 +82,7 @@ std::vector<glm::mat4> GetBonesFinalTransformations(const Model& model) {
         }
 
         while (!parentChain.empty()) {
-            parentIndex = parentChain.front();
+            parentIndex = parentChain.top();
             parentChain.pop();
 
             Bone parentBone = model.bones[parentIndex];
@@ -89,6 +91,7 @@ std::vector<glm::mat4> GetBonesFinalTransformations(const Model& model) {
                 globalTransformations[parentIndex] = bone.transformation;
             }
             else {
+                assert(bonesCalculated[parentBone.parentIndex]);
                 globalTransformations[parentIndex] = globalTransformations[parentBone.parentIndex] * parentBone.transformation;
             }
             finalTransformations[parentIndex] = globalTransformations[parentIndex] * parentBone.offsetMatrix;
@@ -100,6 +103,7 @@ std::vector<glm::mat4> GetBonesFinalTransformations(const Model& model) {
             globalTransformations[i] = bone.transformation;
         }
         else {
+            assert(bonesCalculated[bone.parentIndex]);
             globalTransformations[i] = globalTransformations[bone.parentIndex] * bone.transformation;
         }
         finalTransformations[i] = globalTransformations[i] * bone.offsetMatrix;
@@ -123,7 +127,7 @@ void MainApp::OnInit() {
 
     for (unsigned int i = 0; i < pModel->bones.size(); i++) {
         std::cout << pModel->bones[i].name << std::endl;
-        glm::mat4 transformation = finalTransformations[i];
+        glm::mat4 transformation = pModel->bones[i].transformation * pModel->bones[i].offsetMatrix;
         std::cout << transformation[0][0] << transformation[1][0] << transformation[2][0]<< transformation[3][0] << std::endl;
         std::cout << transformation[0][1] << transformation[1][1] << transformation[2][1]<< transformation[3][1] << std::endl;
         std::cout << transformation[0][2] << transformation[1][2] << transformation[2][2]<< transformation[3][2] << std::endl;
