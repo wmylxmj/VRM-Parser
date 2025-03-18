@@ -1,6 +1,5 @@
 #include <iostream>
 #include <memory>
-#include <queue>
 #include <cassert>
 #include <stack>
 
@@ -127,7 +126,7 @@ void MainApp::OnInit() {
 
     for (unsigned int i = 0; i < pModel->bones.size(); i++) {
         std::cout << pModel->bones[i].name << std::endl;
-        glm::mat4 transformation = pModel->bones[i].transformation * pModel->bones[i].offsetMatrix;
+        glm::mat4 transformation = finalTransformations[i];
         std::cout << transformation[0][0] << transformation[1][0] << transformation[2][0]<< transformation[3][0] << std::endl;
         std::cout << transformation[0][1] << transformation[1][1] << transformation[2][1]<< transformation[3][1] << std::endl;
         std::cout << transformation[0][2] << transformation[1][2] << transformation[2][2]<< transformation[3][2] << std::endl;
