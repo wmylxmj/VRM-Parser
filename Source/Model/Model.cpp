@@ -146,7 +146,7 @@ void Model::NodeProcessing(const aiNode *pNode, glm::mat4 rootTransformation, un
     // 当前的节点变换
     glm::mat4 nodeTransformation;
     memcpy(&nodeTransformation, &pNode->mTransformation, sizeof(aiMatrix4x4));
-    nodeTransformation = glm::inverse(nodeTransformation);
+    nodeTransformation = glm::transpose(nodeTransformation);
     // 如果该节点是骨骼节点，更新父索引
     if (const std::string nodeName(pNode->mName.data); boneIndexMapping.contains(nodeName)) {
         bones[boneIndexMapping[nodeName]].parentIndex = parentIndex;
