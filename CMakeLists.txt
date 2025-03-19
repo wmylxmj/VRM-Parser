@@ -21,6 +21,8 @@ add_executable(VRM_Parser Source/main.cpp
         ThirdParty/tinygltf/tiny_gltf.h
 )
 
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty)
+
 find_package(assimp CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE assimp::assimp)
 
