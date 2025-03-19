@@ -123,7 +123,7 @@ void MainApp::OnInit() {
     // 模型上传
     GL_CHECK_ERRORS(SetUpModelToGL(*pModel, vao, vbo, ebo));
     std::vector<glm::mat4> finalTransformations = GetBonesFinalTransformations(*pModel);
-
+    /*
     for (unsigned int i = 0; i < pModel->bones.size(); i++) {
         std::cout << pModel->bones[i].name << std::endl;
         glm::mat4 transformation = finalTransformations[i];
@@ -132,6 +132,7 @@ void MainApp::OnInit() {
         std::cout << transformation[0][2] << transformation[1][2] << transformation[2][2]<< transformation[3][2] << std::endl;
         std::cout << transformation[0][3] << transformation[1][3] << transformation[2][3]<< transformation[3][3] << std::endl;
     }
+    */
 
     float xMin = FLT_MAX;
     float xMax = -FLT_MAX;
