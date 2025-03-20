@@ -13,20 +13,33 @@
 
 #include <iostream>
 
-// 从 GLB 文件中提取 JSON
-std::string ExtractVRMJson(const std::string& path) {
-    std::ifstream file(path, std::ios::binary);
-    file.seekg(12); // 跳过 GLB 头部
-    uint32_t jsonLength;
-    file.read(reinterpret_cast<char*>(&jsonLength), 4);
-    file.ignore(4); // 跳过块类型
-    std::string json(jsonLength, '\0');
-    file.read(&json[0], jsonLength);
+
+std::string VrmModel::ExtractVRMJson(const std::string &filePath) {
+    std::ifstream file(filePath, std::ios::binary);
+    // 检查头部 （魔数，版本号，文件长度）
+    std::string magic(sizeof(unsigned int), '\0');
+    file.read(magic.data(), sizeof(unsigned int));
+    assert(magic == "glTF");
+    unsigned int version;
+    file.read(reinterpret_cast<char*>(&version), sizeof(unsigned int));
+    assert(version == 2);
+    file.ignore(sizeof(unsigned int)); // 跳过文件长度
+
+    // 检查 JSON 块
+    unsigned int chunkLength;
+    file.read(reinterpret_cast<char*>(&chunkLength), sizeof(unsigned int));
+    // 检查块类型
+    std::string chunkType(sizeof(unsigned int), '\0');
+    file.read(chunkType.data(), sizeof(unsigned int));
+    assert(chunkType == "JSON");
+    // 读取 JSON
+    std::string json(chunkLength, '\0');
+    file.read(&json[0], chunkLength);
     return json;
 }
 
-
 VrmModel::VrmModel(const std::string& filePath) : Model(filePath) {
+
     std::string json = ExtractVRMJson(filePath);
     //std::cout << json << std::endl;
     auto gltf = nlohmann::json::parse(json);
@@ -53,4 +66,5 @@ VrmModel::VrmModel(const std::string& filePath) : Model(filePath) {
     // if (!warn.empty()) std::cerr << "WARNING: " << warn << std::endl;
     // if (!err.empty()) std::cerr << "ERROR: " << err << std::endl;
     // if (!success) return;
+
 }

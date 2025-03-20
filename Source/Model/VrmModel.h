@@ -9,4 +9,7 @@ class VrmModel : public Model {
 
 public:
     explicit VrmModel(const std::string& filePath);
+
+private:
+    std::string ExtractVRMJson(const std::string& filePath);
 };
