@@ -95,7 +95,7 @@ void Model::MeshProcessing(const aiMesh *pMesh, const aiScene *pScene) {
 
 void Model::BoneProcessing(const aiBone *pBone, const MeshEntry &meshEntry) {
     const std::string boneName(pBone->mName.data);
-    const unsigned int boneIndex = boneIndexMapping.contains(boneName) ? boneIndexMapping[boneName] : bones.size();
+    const unsigned int boneIndex = boneNameIndexMapping.contains(boneName) ? boneNameIndexMapping[boneName] : bones.size();
 
     bool boneHasWeights = false; // 用于去除权重全为0的无效骨骼
     for (unsigned int i = 0; i < pBone->mNumWeights; ++i) {
@@ -137,7 +137,7 @@ void Model::BoneProcessing(const aiBone *pBone, const MeshEntry &meshEntry) {
         bone.parentIndex = INVALID_PARENT;
         memcpy(&bone.offsetMatrix, &pBone->mOffsetMatrix.a1, sizeof(aiMatrix4x4));
         bone.offsetMatrix = glm::transpose(bone.offsetMatrix);
-        boneIndexMapping[boneName] = bones.size();
+        boneNameIndexMapping[boneName] = bones.size();
         bones.push_back(bone);
     }
 }
@@ -148,11 +148,11 @@ void Model::NodeProcessing(const aiNode *pNode, glm::mat4 rootTransformation, un
     memcpy(&nodeTransformation, &pNode->mTransformation, sizeof(aiMatrix4x4));
     nodeTransformation = glm::transpose(nodeTransformation);
     // 如果该节点是骨骼节点，更新父索引
-    if (const std::string nodeName(pNode->mName.data); boneIndexMapping.contains(nodeName)) {
-        bones[boneIndexMapping[nodeName]].parentIndex = parentIndex;
-        bones[boneIndexMapping[nodeName]].transformation = rootTransformation * nodeTransformation;
+    if (const std::string nodeName(pNode->mName.data); boneNameIndexMapping.contains(nodeName)) {
+        bones[boneNameIndexMapping[nodeName]].parentIndex = parentIndex;
+        bones[boneNameIndexMapping[nodeName]].transformation = rootTransformation * nodeTransformation;
         // 更新父索引
-        parentIndex = boneIndexMapping[nodeName];
+        parentIndex = boneNameIndexMapping[nodeName];
         rootTransformation = glm::mat4(1.0f);
     }
     // 否则更新骨骼的根变换

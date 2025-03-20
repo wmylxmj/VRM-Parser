@@ -41,7 +41,7 @@ class Model {
 
 public:
     std::vector<Bone> bones;
-    std::map<std::string, unsigned int> boneIndexMapping; // maps a bone name to its index
+    std::map<std::string, unsigned int> boneNameIndexMapping; // maps a bone name to its index
     std::vector<MeshEntry> meshEntries;
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;

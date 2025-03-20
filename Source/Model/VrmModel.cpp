@@ -36,8 +36,14 @@ VrmModel::VrmModel(const std::string& filePath) : Model(filePath) {
     for (int i = 0; i < gltf["extensions"]["VRM"]["humanoid"]["humanBones"].size(); i++) {
         auto humanBone = gltf["extensions"]["VRM"]["humanoid"]["humanBones"][i];
         auto node = gltf["nodes"][static_cast<int>(humanBone["node"])];
-        std::cout << humanBone["bone"] << "->" << node["name"] << "->" << boneIndexMapping[node["name"]] << std::endl;
+        std::cout << humanBone["bone"] << "->" << node["name"] << "->" << boneNameIndexMapping[node["name"]] << std::endl;
     }
+
+    for (auto& [key, value] : gltf["extensions"]["VRM"]["humanoid"]["hasTranslationDoF"].items()) {
+        std::cout << key << std::endl;
+    }
+    std::cout << gltf["extensions"]["VRM"]["humanoid"] << std::endl;
+
     // tinygltf::Model model;
     // tinygltf::TinyGLTF loader;
     // std::string err, warn;
