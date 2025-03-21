@@ -8,6 +8,7 @@
 class VrmModel : public Model {
 
 public:
+    std::map<std::string, unsigned int> humanBoneNameIndexMapping;
     explicit VrmModel(const std::string& filePath);
 
 private:
