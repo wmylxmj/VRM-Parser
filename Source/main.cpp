@@ -48,9 +48,9 @@ void SetUpModelToGL(const Model& model, GLuint &vao,GLuint &vbo, GLuint &ebo) {
     // 顶点法线
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, normal)));
-    // 顶点骨骼索引
+    // 顶点骨骼索引 注意对于整型，需要用IPointer
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, NUM_BONES_PER_VERTEX, GL_UNSIGNED_INT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, boneIndices)));
+    glVertexAttribIPointer(2, NUM_BONES_PER_VERTEX, GL_UNSIGNED_INT, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, boneIndices)));
     // 顶点骨骼权重
     glEnableVertexAttribArray(3);
     glVertexAttribPointer(3, NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, boneWeights)));
@@ -121,15 +121,15 @@ void MainApp::OnInit() {
     // 导入模型
     pModel = std::make_unique<VrmModel>(R"(E:\vrm\20220331_1455\20220331_1455\base body\black cat base body v3.5.0.vrm)");
     //pModel = std::make_unique<Model>(R"(C:\Users\13973\Downloads\207337_open3dmodel.com\1451_sphere\sphere.obj)");
+
     // 模型上传
     GL_CHECK_ERRORS(SetUpModelToGL(*pModel, vao, vbo, ebo));
 
     std::vector<glm::mat4> finalTransformations = GetBonesFinalTransformations(*pModel);
     glGenBuffers(1, &ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-    glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), nullptr, GL_DYNAMIC_DRAW);
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)*200, nullptr, GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo); // 关联 UBO 到绑定点 0
 
     for (unsigned int i = 0; i < pModel->bones.size(); i++) {
         std::cout << pModel->bones[i].name << std::endl;
@@ -182,16 +182,17 @@ void MainApp::OnUpdate() {
     shader.SetMat4("matView", camera.GetCameraMatrix());
     shader.SetMat4("matProjection", camera.GetPerspectiveMatrix());
 
-    std::vector<glm::mat4> finalTransformations = GetBonesFinalTransformations(*pModel);
-    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), finalTransformations.data());
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+
 }
 
 void MainApp::OnRender() {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    std::vector<glm::mat4> finalTransformations = GetBonesFinalTransformations(*pModel);
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4)*finalTransformations.size(), finalTransformations.data());
     const Model model = *pModel;
     GL_CHECK_ERRORS(glBindVertexArray(vao));
     GL_CHECK_ERRORS(glDrawElements(GL_TRIANGLES, model.indices.size(), GL_UNSIGNED_INT, nullptr));
