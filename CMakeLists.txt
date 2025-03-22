@@ -19,6 +19,8 @@ add_executable(VRM_Parser Source/main.cpp
         ThirdParty/tinygltf/stb_image.h
         ThirdParty/tinygltf/stb_image_write.h
         ThirdParty/tinygltf/tiny_gltf.h
+        Source/Model/ModelUtilities.cpp
+        Source/Model/ModelUtilities.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty)
