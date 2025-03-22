@@ -17,6 +17,7 @@ public:
     std::unique_ptr<ShaderProgram> pShader;
     std::unique_ptr<Model> pModel;
     GLuint vao, vbo, ebo;
+    GLuint ubo;
 
     bool LoopCondition() override { return !glfwWindowShouldClose(window); }
     void OnInit() override;
@@ -57,8 +58,6 @@ void SetUpModelToGL(const Model& model, GLuint &vao,GLuint &vbo, GLuint &ebo) {
     glBindVertexArray(0);
 }
 
-
-
 std::vector<glm::mat4> GetBonesFinalTransformations(const Model& model) {
     // 缓存，避免重复计算
     std::vector<glm::mat4> finalTransformations(model.bones.size());
@@ -87,7 +86,7 @@ std::vector<glm::mat4> GetBonesFinalTransformations(const Model& model) {
             Bone parentBone = model.bones[parentIndex];
 
             if (parentBone.parentIndex == INVALID_PARENT) {
-                globalTransformations[parentIndex] = bone.transformation;
+                globalTransformations[parentIndex] = parentBone.transformation;
             }
             else {
                 assert(bonesCalculated[parentBone.parentIndex]);
@@ -112,6 +111,7 @@ std::vector<glm::mat4> GetBonesFinalTransformations(const Model& model) {
     return finalTransformations;
 }
 
+
 void MainApp::OnInit() {
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GL_TRUE);
     window = glfwCreateWindow(1024, 1024, "Vrm Parser", nullptr, nullptr);
@@ -120,10 +120,17 @@ void MainApp::OnInit() {
     glEnable(GL_DEPTH_TEST);
     // 导入模型
     pModel = std::make_unique<VrmModel>(R"(E:\vrm\20220331_1455\20220331_1455\base body\black cat base body v3.5.0.vrm)");
+    //pModel = std::make_unique<Model>(R"(C:\Users\13973\Downloads\207337_open3dmodel.com\1451_sphere\sphere.obj)");
     // 模型上传
     GL_CHECK_ERRORS(SetUpModelToGL(*pModel, vao, vbo, ebo));
+
     std::vector<glm::mat4> finalTransformations = GetBonesFinalTransformations(*pModel);
-    /*
+    glGenBuffers(1, &ubo);
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+    glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), nullptr, GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
     for (unsigned int i = 0; i < pModel->bones.size(); i++) {
         std::cout << pModel->bones[i].name << std::endl;
         glm::mat4 transformation = finalTransformations[i];
@@ -132,7 +139,7 @@ void MainApp::OnInit() {
         std::cout << transformation[0][2] << transformation[1][2] << transformation[2][2]<< transformation[3][2] << std::endl;
         std::cout << transformation[0][3] << transformation[1][3] << transformation[2][3]<< transformation[3][3] << std::endl;
     }
-    */
+
 
     float xMin = FLT_MAX;
     float xMax = -FLT_MAX;
@@ -148,8 +155,17 @@ void MainApp::OnInit() {
         if (vertex.position.z < zMin) zMin = vertex.position.z;
         if (vertex.position.z > zMax) zMax = vertex.position.z;
     }
+/*
+    std::cout << "xMin: " << xMin << std::endl;
+    std::cout << "xMax: " << xMax << std::endl;
+    std::cout << "yMin: " << yMin << std::endl;
+    std::cout << "yMax: " << yMax << std::endl;
+    std::cout << "zMin: " << zMin << std::endl;
+    std::cout << "zMax: " << zMax << std::endl;
+    */
 
     camera.eyePosition = glm::vec3(0.5*(xMax+xMin), 0.5*(yMin+yMax), zMax+std::max(zMax-zMin, std::max(xMax-xMin, yMax-yMin)));
+    camera.zFar = 10000;
 
     pShader = std::make_unique<ShaderProgram>(R"(E:\VRM-Parser\Source\Shaders\Shader.vsh)", R"(E:\VRM-Parser\Source\Shaders\Shader.fsh)");
     GL_CHECK_ERRORS();
@@ -165,6 +181,11 @@ void MainApp::OnUpdate() {
     GL_CHECK_ERRORS(shader.SetMat4("matModel", glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f))));
     shader.SetMat4("matView", camera.GetCameraMatrix());
     shader.SetMat4("matProjection", camera.GetPerspectiveMatrix());
+
+    std::vector<glm::mat4> finalTransformations = GetBonesFinalTransformations(*pModel);
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), finalTransformations.data());
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
 void MainApp::OnRender() {
