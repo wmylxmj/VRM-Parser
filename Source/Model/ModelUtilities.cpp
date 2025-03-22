@@ -3,6 +3,7 @@
 //
 
 #include "ModelUtilities.h"
+#include <stack>
 
 void SetupModelToGL(const Model& model, GLuint &vao,GLuint &vbo, GLuint &ebo) {
     // 创建缓冲区对象
@@ -36,3 +37,58 @@ void SetupModelToGL(const Model& model, GLuint &vao,GLuint &vbo, GLuint &ebo) {
 
     glBindVertexArray(0);
 }
+
+std::vector<glm::mat4> CalcBonesFinalTransformations(const Model& model) {
+    // 缓存，避免重复计算
+    std::vector<glm::mat4> finalTransformations(model.bones.size());
+    std::vector<glm::mat4> globalTransformations(model.bones.size());
+    std::vector<bool> bonesCalculated(model.bones.size(), false);
+
+    for (int i = 0; i < model.bones.size(); i++) {
+        // 如果已计算，则跳过
+        if (bonesCalculated[i]) continue;
+
+        Bone bone(model.bones[i]);
+
+        unsigned int parentIndex = bone.parentIndex;
+        std::stack<unsigned int> parentChain;
+
+        // 溯源到已计算的父节点或根节点
+        while (parentIndex != INVALID_PARENT && !bonesCalculated[parentIndex]) {
+            parentChain.push(parentIndex);
+            parentIndex = model.bones[parentIndex].parentIndex;
+        }
+
+        while (!parentChain.empty()) {
+            parentIndex = parentChain.top();
+            parentChain.pop();
+
+            Bone parentBone = model.bones[parentIndex];
+
+            if (parentBone.parentIndex == INVALID_PARENT) {
+                globalTransformations[parentIndex] = parentBone.transformation;
+            }
+            else {
+                assert(bonesCalculated[parentBone.parentIndex]);
+                globalTransformations[parentIndex] = globalTransformations[parentBone.parentIndex] * parentBone.transformation;
+            }
+            finalTransformations[parentIndex] = globalTransformations[parentIndex] * parentBone.offsetMatrix;
+            bonesCalculated[parentIndex] = true;
+        }
+
+        // 计算当前骨骼变换矩阵
+        if (bone.parentIndex == INVALID_PARENT) {
+            globalTransformations[i] = bone.transformation;
+        }
+        else {
+            assert(bonesCalculated[bone.parentIndex]);
+            globalTransformations[i] = globalTransformations[bone.parentIndex] * bone.transformation;
+        }
+        finalTransformations[i] = globalTransformations[i] * bone.offsetMatrix;
+        bonesCalculated[i] = true;
+    }
+
+    return finalTransformations;
+}
+
+
