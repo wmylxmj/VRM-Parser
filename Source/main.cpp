@@ -8,6 +8,7 @@
 #include "Core/IApplication.h"
 #include "Model/VrmModel.h"
 #include "Core//Shader.h"
+#include "Model/ModelUtilities.h"
 
 class MainApp final : public IApplication {
 
@@ -25,92 +26,6 @@ public:
     void OnRender() override;
 };
 
-void SetUpModelToGL(const Model& model, GLuint &vao,GLuint &vbo, GLuint &ebo) {
-    // 创建缓冲区对象
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
-    glGenBuffers(1, &ebo);
-
-    // 将VBO绑定到VAO
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-    // 传输顶点数据
-    glBufferData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(Vertex), model.vertices.data(), GL_STATIC_DRAW);
-
-    // 传输索引数据
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, model.indices.size() * sizeof(unsigned int), model.indices.data(), GL_STATIC_DRAW);
-
-    // 顶点位置
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, position)));
-    // 顶点法线
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, normal)));
-    // 顶点骨骼索引 注意对于整型，需要用IPointer
-    glEnableVertexAttribArray(2);
-    glVertexAttribIPointer(2, NUM_BONES_PER_VERTEX, GL_UNSIGNED_INT, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, boneIndices)));
-    // 顶点骨骼权重
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, boneWeights)));
-
-    glBindVertexArray(0);
-}
-
-std::vector<glm::mat4> GetBonesFinalTransformations(const Model& model) {
-    // 缓存，避免重复计算
-    std::vector<glm::mat4> finalTransformations(model.bones.size());
-    std::vector<glm::mat4> globalTransformations(model.bones.size());
-    std::vector<bool> bonesCalculated(model.bones.size(), false);
-
-    for (int i = 0; i < model.bones.size(); i++) {
-        // 如果已计算，则跳过
-        if (bonesCalculated[i]) continue;
-
-        Bone bone(model.bones[i]);
-
-        unsigned int parentIndex = bone.parentIndex;
-        std::stack<unsigned int> parentChain;
-
-        // 溯源到已计算的父节点或根节点
-        while (parentIndex != INVALID_PARENT && !bonesCalculated[parentIndex]) {
-            parentChain.push(parentIndex);
-            parentIndex = model.bones[parentIndex].parentIndex;
-        }
-
-        while (!parentChain.empty()) {
-            parentIndex = parentChain.top();
-            parentChain.pop();
-
-            Bone parentBone = model.bones[parentIndex];
-
-            if (parentBone.parentIndex == INVALID_PARENT) {
-                globalTransformations[parentIndex] = parentBone.transformation;
-            }
-            else {
-                assert(bonesCalculated[parentBone.parentIndex]);
-                globalTransformations[parentIndex] = globalTransformations[parentBone.parentIndex] * parentBone.transformation;
-            }
-            finalTransformations[parentIndex] = globalTransformations[parentIndex] * parentBone.offsetMatrix;
-            bonesCalculated[parentIndex] = true;
-        }
-
-        // 计算当前骨骼变换矩阵
-        if (bone.parentIndex == INVALID_PARENT) {
-            globalTransformations[i] = bone.transformation;
-        }
-        else {
-            assert(bonesCalculated[bone.parentIndex]);
-            globalTransformations[i] = globalTransformations[bone.parentIndex] * bone.transformation;
-        }
-        finalTransformations[i] = globalTransformations[i] * bone.offsetMatrix;
-        bonesCalculated[i] = true;
-    }
-
-    return finalTransformations;
-}
-
 
 void MainApp::OnInit() {
     glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, GL_TRUE);
@@ -123,11 +38,11 @@ void MainApp::OnInit() {
     //pModel = std::make_unique<Model>(R"(C:\Users\13973\Downloads\207337_open3dmodel.com\1451_sphere\sphere.obj)");
 
     // 模型上传
-    GL_CHECK_ERRORS(SetUpModelToGL(*pModel, vao, vbo, ebo));
+    GL_CHECK_ERRORS(SetupModelToGL(*pModel, vao, vbo, ebo));
 
     pModel->bones[pModel->boneNameIndexMapping["J_Bip_R_LowerLeg"]].transformation = pModel->bones[pModel->boneNameIndexMapping["J_Bip_R_LowerLeg"]].transformation *
         glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
-    std::vector<glm::mat4> finalTransformations = GetBonesFinalTransformations(*pModel);
+    std::vector<glm::mat4> finalTransformations = CalcBonesFinalTransformations(*pModel);
     glGenBuffers(1, &ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)*200, nullptr, GL_DYNAMIC_DRAW);
@@ -176,7 +91,7 @@ void MainApp::OnUpdate() {
     shader.SetMat4("matView", camera.GetCameraMatrix());
     shader.SetMat4("matProjection", camera.GetPerspectiveMatrix());
 
-    std::vector<glm::mat4> finalTransformations = GetBonesFinalTransformations(*pModel);
+    std::vector<glm::mat4> finalTransformations = CalcBonesFinalTransformations(*pModel);
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4)*finalTransformations.size(), finalTransformations.data());
 }
