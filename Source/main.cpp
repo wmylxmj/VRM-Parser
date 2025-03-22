@@ -17,6 +17,7 @@ public:
     Camera camera;
     std::unique_ptr<ShaderProgram> pShader;
     std::unique_ptr<Model> pModel;
+    std::unique_ptr<Model> pJointBall;
     GLuint vao, vbo, ebo;
     GLuint ubo;
 
@@ -35,6 +36,7 @@ void MainApp::OnInit() {
     glEnable(GL_DEPTH_TEST);
     // 导入模型
     pModel = std::make_unique<VrmModel>(R"(E:\vrm\20220331_1455\20220331_1455\base body\black cat base body v3.5.0.vrm)");
+    pJointBall = std::make_unique<Model>(R"(E:\Geometry Generation\UnitSphere.obj)");
     //pModel = std::make_unique<Model>(R"(C:\Users\13973\Downloads\207337_open3dmodel.com\1451_sphere\sphere.obj)");
 
     // 模型上传
