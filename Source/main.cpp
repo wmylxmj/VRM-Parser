@@ -125,6 +125,8 @@ void MainApp::OnInit() {
     // 模型上传
     GL_CHECK_ERRORS(SetUpModelToGL(*pModel, vao, vbo, ebo));
 
+    pModel->bones[pModel->boneNameIndexMapping["J_Bip_R_LowerLeg"]].transformation = pModel->bones[pModel->boneNameIndexMapping["J_Bip_R_LowerLeg"]].transformation *
+        glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
     std::vector<glm::mat4> finalTransformations = GetBonesFinalTransformations(*pModel);
     glGenBuffers(1, &ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
@@ -155,14 +157,6 @@ void MainApp::OnInit() {
         if (vertex.position.z < zMin) zMin = vertex.position.z;
         if (vertex.position.z > zMax) zMax = vertex.position.z;
     }
-/*
-    std::cout << "xMin: " << xMin << std::endl;
-    std::cout << "xMax: " << xMax << std::endl;
-    std::cout << "yMin: " << yMin << std::endl;
-    std::cout << "yMax: " << yMax << std::endl;
-    std::cout << "zMin: " << zMin << std::endl;
-    std::cout << "zMax: " << zMax << std::endl;
-    */
 
     camera.eyePosition = glm::vec3(0.5*(xMax+xMin), 0.5*(yMin+yMax), zMax+std::max(zMax-zMin, std::max(xMax-xMin, yMax-yMin)));
     camera.zFar = 10000;
@@ -178,21 +172,19 @@ void MainApp::OnUpdate() {
     camera.aspect = (float)windowWidth / (float)windowHeight;
     const ShaderProgram shader = *pShader;
     GL_CHECK_ERRORS(glUseProgram(shader.glID));
-    GL_CHECK_ERRORS(shader.SetMat4("matModel", glm::rotate(glm::mat4(1.0f), glm::radians(180.0f), glm::vec3(0.0f, 1.0f, 0.0f))));
+    GL_CHECK_ERRORS(shader.SetMat4("matModel", glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f))));
     shader.SetMat4("matView", camera.GetCameraMatrix());
     shader.SetMat4("matProjection", camera.GetPerspectiveMatrix());
 
-
-
+    std::vector<glm::mat4> finalTransformations = GetBonesFinalTransformations(*pModel);
+    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4)*finalTransformations.size(), finalTransformations.data());
 }
 
 void MainApp::OnRender() {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    std::vector<glm::mat4> finalTransformations = GetBonesFinalTransformations(*pModel);
-    glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4)*finalTransformations.size(), finalTransformations.data());
     const Model model = *pModel;
     GL_CHECK_ERRORS(glBindVertexArray(vao));
     GL_CHECK_ERRORS(glDrawElements(GL_TRIANGLES, model.indices.size(), GL_UNSIGNED_INT, nullptr));
