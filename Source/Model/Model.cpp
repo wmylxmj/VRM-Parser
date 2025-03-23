@@ -151,6 +151,7 @@ void Model::NodeProcessing(const aiNode *pNode, glm::mat4 rootTransformation, un
     if (const std::string nodeName(pNode->mName.data); boneNameIndexMapping.contains(nodeName)) {
         bones[boneNameIndexMapping[nodeName]].parentIndex = parentIndex;
         bones[boneNameIndexMapping[nodeName]].transformation = rootTransformation * nodeTransformation;
+        bones[boneNameIndexMapping[nodeName]].bindingPoseTransformation = bones[boneNameIndexMapping[nodeName]].transformation;
         // 更新父索引
         parentIndex = boneNameIndexMapping[nodeName];
         rootTransformation = glm::mat4(1.0f);

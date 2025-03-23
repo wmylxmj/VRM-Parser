@@ -29,6 +29,7 @@ typedef struct {
     unsigned int parentIndex;
     glm::mat4 offsetMatrix;
     glm::mat4 transformation;
+    glm::mat4 bindingPoseTransformation;
 } Bone;
 
 typedef struct {
