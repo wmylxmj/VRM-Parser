@@ -37,12 +37,12 @@ void MainApp::OnInit() {
     // 导入模型
     pModel = std::make_unique<VrmModel>(R"(E:\vrm\20220331_1455\20220331_1455\base body\black cat base body v3.5.0.vrm)");
     pJointBall = std::make_unique<Model>(R"(E:\Geometry Generation\UnitSphere.obj)");
-    //pModel = std::make_unique<Model>(R"(C:\Users\13973\Downloads\207337_open3dmodel.com\1451_sphere\sphere.obj)");
 
     // 模型上传
     GL_CHECK_ERRORS(SetupModelToGL(*pModel, vao, vbo, ebo));
 
-    pModel->bones[pModel->boneNameIndexMapping["J_Bip_R_LowerLeg"]].transformation = pModel->bones[pModel->boneNameIndexMapping["J_Bip_R_LowerLeg"]].transformation *
+    pModel->bones[pModel->boneNameIndexMapping["J_Bip_R_LowerLeg"]].transformation =
+        pModel->bones[pModel->boneNameIndexMapping["J_Bip_R_LowerLeg"]].bindingPoseTransformation *
         glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
     std::vector<glm::mat4> finalTransformations = CalcBonesFinalTransformations(*pModel);
     glGenBuffers(1, &ubo);
