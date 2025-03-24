@@ -21,6 +21,8 @@ add_executable(VRM_Parser Source/main.cpp
         ThirdParty/tinygltf/tiny_gltf.h
         Source/Model/ModelUtilities.cpp
         Source/Model/ModelUtilities.h
+        Source/InteractiveGeometry/JointBall.cpp
+        Source/InteractiveGeometry/JointBall.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty)
