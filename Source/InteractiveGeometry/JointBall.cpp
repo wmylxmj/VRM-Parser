@@ -38,7 +38,7 @@ void JointBall::SetupModelToGL() {
     glBindVertexArray(0);
 }
 
-void JointBall::GenerateMesh(unsigned int numDivisions) {
+void JointBall::GenerateMesh(const unsigned int numDivisions) {
     // 北极点
     vertices.push_back({glm::vec3(0, 1, 0), glm::vec3(0, 1, 0)});
 
