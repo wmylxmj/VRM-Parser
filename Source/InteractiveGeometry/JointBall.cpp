@@ -15,6 +15,7 @@ void JointBall::SetupModelToGL() {
     // 创建缓冲区对象
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
+    glGenBuffers(1, &instanceVBO);
     glGenBuffers(1, &ebo);
 
     // 将VBO绑定到VAO
@@ -34,6 +35,17 @@ void JointBall::SetupModelToGL() {
     // 顶点法线
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(JointBall::Vertex), reinterpret_cast<void *>(offsetof(JointBall::Vertex, normal)));
+
+    // 实例属性
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(JointBall::InstanceAttributes) * 200, nullptr, GL_STATIC_DRAW);
+
+    // 实例变换矩阵
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 16, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(offsetof(JointBall::InstanceAttributes, matModel)));
+    // 实例颜色
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(offsetof(JointBall::InstanceAttributes, color)));
 
     glBindVertexArray(0);
 }

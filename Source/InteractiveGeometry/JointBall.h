@@ -11,10 +11,16 @@ class JointBall {
 
 public:
     GLuint vao{}, vbo{}, ebo{};
+    GLuint instanceVBO{};
 
     struct Vertex {
         glm::vec3 position;
         glm::vec3 normal;
+    };
+
+    struct InstanceAttributes {
+        glm::mat4 matModel;
+        glm::vec4 color;
     };
 
     std::vector<Vertex> vertices;
