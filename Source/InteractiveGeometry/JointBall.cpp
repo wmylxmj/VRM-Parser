@@ -7,10 +7,10 @@
 #include <cmath>
 
 JointBall::JointBall(const unsigned int numDivisions) {
-    Generate(numDivisions);
+    GenerateMesh(numDivisions);
 }
 
-void JointBall::Generate(const unsigned int numDivisions) {
+void JointBall::GenerateMesh(unsigned int numDivisions) {
     // 北极点
     vertices.push_back({glm::vec3(0, 1, 0), glm::vec3(0, 1, 0)});
 

@@ -22,7 +22,7 @@ public:
     explicit JointBall(unsigned int numDivisions = 18);
 
 private:
-    void Generate(unsigned int numDivisions);
+    void GenerateMesh(unsigned int numDivisions);
 };
 
 
