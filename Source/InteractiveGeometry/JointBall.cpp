@@ -8,6 +8,34 @@
 
 JointBall::JointBall(const unsigned int numDivisions) {
     GenerateMesh(numDivisions);
+    SetupModelToGL();
+}
+
+void JointBall::SetupModelToGL() {
+    // 创建缓冲区对象
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ebo);
+
+    // 将VBO绑定到VAO
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    // 传输顶点数据
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(JointBall::Vertex), vertices.data(), GL_STATIC_DRAW);
+
+    // 传输索引数据
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
+
+    // 顶点位置
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(JointBall::Vertex), reinterpret_cast<void *>(offsetof(JointBall::Vertex, position)));
+    // 顶点法线
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(JointBall::Vertex), reinterpret_cast<void *>(offsetof(JointBall::Vertex, normal)));
+
+    glBindVertexArray(0);
 }
 
 void JointBall::GenerateMesh(unsigned int numDivisions) {

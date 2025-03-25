@@ -10,6 +10,7 @@
 class JointBall {
 
 public:
+    GLuint vao{}, vbo{}, ebo{};
 
     struct Vertex {
         glm::vec3 position;
@@ -23,6 +24,8 @@ public:
 
 private:
     void GenerateMesh(unsigned int numDivisions);
+    void SetupModelToGL();
+
 };
 
 
