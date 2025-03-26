@@ -43,9 +43,11 @@ void JointBall::SetupModelToGL() {
     // 实例变换矩阵
     glEnableVertexAttribArray(2);
     glVertexAttribPointer(2, 16, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(offsetof(JointBall::InstanceAttributes, matModel)));
+    glVertexAttribDivisor(2, 1);
     // 实例颜色
     glEnableVertexAttribArray(3);
     glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(offsetof(JointBall::InstanceAttributes, color)));
+    glVertexAttribDivisor(3, 1);
 
     glBindVertexArray(0);
 }
