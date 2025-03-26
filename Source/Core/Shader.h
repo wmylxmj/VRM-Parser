@@ -10,6 +10,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <initializer_list>
 
 extern GLuint CompileShader(const char* shaderCode, GLenum shaderType);
 

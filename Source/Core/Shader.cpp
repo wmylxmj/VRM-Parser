@@ -25,6 +25,28 @@ GLuint CompileShader(const char* shaderCode, const GLenum shaderType) {
     return glID;
 }
 
+GLuint LinkProgram(std::initializer_list<GLuint> shaderIDs) {
+    const GLuint program = glCreateProgram();
+    for(const auto shader : shaderIDs) {
+        glAttachShader(program, shader);
+    }
+
+    glLinkProgram(program);
+
+    GLint success;
+    glGetProgramiv(program, GL_LINK_STATUS, &success);
+    if(!success) {
+        GLint logLength;
+        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
+
+        auto* infoLog = static_cast<GLchar *>(alloca(logLength * sizeof(GLchar)));
+        glGetProgramInfoLog(program, logLength, nullptr, infoLog);
+        std::cout << infoLog << std::endl;
+    }
+
+    return program;
+}
+
 VertexShader::VertexShader(const char *pFile) : Shader() {
     std::string code;
     std::ifstream file;
