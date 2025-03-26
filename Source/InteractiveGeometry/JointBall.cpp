@@ -14,17 +14,16 @@ CMRC_DECLARE(shaderRC);
 JointBall::JointBall(const unsigned int numDivisions) {
     GenerateMesh(numDivisions);
     SetupModelToGL();
-    SetupShaderProgram();
+    GL_CHECK_ERRORS(SetupShaderProgram());
 }
 
 void JointBall::SetupShaderProgram() {
-    auto fileSystem = cmrc::shaderRC::get_filesystem();
+    const auto fileSystem = cmrc::shaderRC::get_filesystem();
     const auto vsFile = fileSystem.open("Source/InteractiveGeometry/Shaders/JointBall.vsh");
     GLuint vsh = CompileShader(vsFile.begin(), GL_VERTEX_SHADER);
     const auto fsFile = fileSystem.open("Source/InteractiveGeometry/Shaders/JointBall.fsh");
     GLuint fsh = CompileShader(fsFile.begin(), GL_FRAGMENT_SHADER);
-
-
+    LinkProgram({vsh, fsh});
 }
 
 
@@ -56,16 +55,28 @@ void JointBall::SetupModelToGL() {
 
     // 实例属性
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(JointBall::InstanceAttributes) * 200, nullptr, GL_STATIC_DRAW);
+    GL_CHECK_ERRORS(glBufferData(GL_ARRAY_BUFFER, sizeof(JointBall::InstanceAttributes) * 200, nullptr, GL_STATIC_DRAW));
 
     // 实例变换矩阵
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 16, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(offsetof(JointBall::InstanceAttributes, matModel)));
-    glVertexAttribDivisor(2, 1);
-    // 实例颜色
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(offsetof(JointBall::InstanceAttributes, color)));
-    glVertexAttribDivisor(3, 1);
+    glEnableVertexAttribArray(4);
+    glEnableVertexAttribArray(5);
+
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(offsetof(JointBall::InstanceAttributes, matModel)));
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(4 * sizeof(float) + offsetof(JointBall::InstanceAttributes, matModel)));
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(8 * sizeof(float) + offsetof(JointBall::InstanceAttributes, matModel)));
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(12 * sizeof(float) * offsetof(JointBall::InstanceAttributes, matModel)));
+
+    GL_CHECK_ERRORS(glVertexAttribDivisor(2, 1));
+    GL_CHECK_ERRORS(glVertexAttribDivisor(3, 1));
+    GL_CHECK_ERRORS(glVertexAttribDivisor(4, 1));
+    GL_CHECK_ERRORS(glVertexAttribDivisor(5, 1));
+
+    // 实例颜色
+    glEnableVertexAttribArray(6);
+    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(offsetof(JointBall::InstanceAttributes, color)));
+    GL_CHECK_ERRORS(glVertexAttribDivisor(6, 1));
 
     glBindVertexArray(0);
 }
