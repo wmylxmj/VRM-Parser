@@ -9,6 +9,7 @@
 #include "Model/VrmModel.h"
 #include "Core//Shader.h"
 #include "Model/ModelUtilities.h"
+#include "InteractiveGeometry/JointBall.h"
 
 class MainApp final : public IApplication {
 
@@ -17,7 +18,7 @@ public:
     Camera camera;
     std::unique_ptr<ShaderProgram> pShader;
     std::unique_ptr<Model> pModel;
-    std::unique_ptr<Model> pJointBall;
+    std::unique_ptr<JointBall> pJointBall;
     GLuint vao, vbo, ebo;
     GLuint ubo;
 
@@ -36,7 +37,8 @@ void MainApp::OnInit() {
     glEnable(GL_DEPTH_TEST);
     // 导入模型
     pModel = std::make_unique<VrmModel>(R"(E:\vrm\20220331_1455\20220331_1455\base body\black cat base body v3.5.0.vrm)");
-    pJointBall = std::make_unique<Model>(R"(E:\Geometry Generation\UnitSphere.obj)");
+    pJointBall = std::make_unique<JointBall>();
+
 
     // 模型上传
     GL_CHECK_ERRORS(SetupModelToGL(*pModel, vao, vbo, ebo));
