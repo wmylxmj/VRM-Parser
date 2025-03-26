@@ -13,6 +13,7 @@
 #include <initializer_list>
 
 extern GLuint CompileShader(const char* shaderCode, GLenum shaderType);
+extern GLuint LinkProgram(std::initializer_list<GLuint> shaderIDs);
 
 class Shader {
 public:
