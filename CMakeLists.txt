@@ -43,7 +43,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
 find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
-find_package(CMakeRC)
+include(ThirdParty/cmrc/CMakeRC.cmake)
 cmrc_add_resource_library(shaderRC
         Source/InteractiveGeometry/Shaders/JointBall.vsh
         Source/InteractiveGeometry/Shaders/JointBall.fsh

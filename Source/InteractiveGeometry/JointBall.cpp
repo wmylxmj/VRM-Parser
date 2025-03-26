@@ -6,10 +6,28 @@
 
 #include <cmath>
 
+#include "../Core/Shader.h"
+
+#include <cmrc/cmrc.hpp>
+CMRC_DECLARE(shaderRC);
+
 JointBall::JointBall(const unsigned int numDivisions) {
     GenerateMesh(numDivisions);
     SetupModelToGL();
+    SetupShaderProgram();
 }
+
+void JointBall::SetupShaderProgram() {
+    auto fileSystem = cmrc::shaderRC::get_filesystem();
+    const auto vsFile = fileSystem.open("Source/InteractiveGeometry/Shaders/JointBall.vsh");
+    GLuint vsh = CompileShader(vsFile.begin(), GL_VERTEX_SHADER);
+    const auto fsFile = fileSystem.open("Source/InteractiveGeometry/Shaders/JointBall.fsh");
+    GLuint fsh = CompileShader(fsFile.begin(), GL_FRAGMENT_SHADER);
+
+
+}
+
+
 
 void JointBall::SetupModelToGL() {
     // 创建缓冲区对象

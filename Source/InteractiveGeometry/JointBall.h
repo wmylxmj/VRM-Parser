@@ -31,6 +31,7 @@ public:
 private:
     void GenerateMesh(unsigned int numDivisions);
     void SetupModelToGL();
+    void SetupShaderProgram();
 
 };
 
