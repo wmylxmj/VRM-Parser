@@ -6,6 +6,25 @@
 
 #include <memory>
 
+GLuint CompileShader(const char* shaderCode, const GLenum shaderType) {
+    const GLuint glID = glCreateShader(shaderType);
+    glShaderSource(glID, 1, &shaderCode, nullptr);
+    glCompileShader(glID);
+
+    GLint success;
+    glGetShaderiv(glID, GL_COMPILE_STATUS, &success);
+    if(!success) {
+        GLint logLength;
+        glGetShaderiv(glID, GL_INFO_LOG_LENGTH, &logLength);
+
+        auto* infoLog = static_cast<GLchar *>(alloca(logLength * sizeof(GLchar)));
+        glGetShaderInfoLog(glID, logLength, nullptr, infoLog);
+        std::cout << infoLog << std::endl;
+    }
+
+    return glID;
+}
+
 VertexShader::VertexShader(const char *pFile) : Shader() {
     std::string code;
     std::ifstream file;

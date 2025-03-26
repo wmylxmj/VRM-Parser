@@ -11,6 +11,8 @@
 #include <sstream>
 #include <iostream>
 
+extern GLuint CompileShader(const char* shaderCode, GLenum shaderType);
+
 class Shader {
 public:
     GLuint glID;

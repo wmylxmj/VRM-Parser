@@ -3,7 +3,8 @@ project(VRM_Parser)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(VRM_Parser Source/main.cpp
+add_executable(${PROJECT_NAME}
+        Source/main.cpp
         Source/Model/Model.cpp
         Source/Model/Model.h
         Source/Model/VrmModel.cpp
@@ -41,3 +42,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
 
 find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
+
+find_package(CMakeRC)
+cmrc_add_resource_library(shaderRC
+        Source/InteractiveGeometry/Shaders/JointBall.vsh
+        Source/InteractiveGeometry/Shaders/JointBall.fsh
+)
+target_link_libraries(${PROJECT_NAME} PRIVATE shaderRC)
