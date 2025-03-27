@@ -15,18 +15,15 @@
 extern GLuint CompileShader(const char* shaderCode, GLenum shaderType);
 extern GLuint LinkProgram(std::initializer_list<GLuint> shaderIDs);
 
-class Shader {
-public:
-    GLuint glID;
+void SetShaderUniformInt(GLuint shaderID, const std::string &name, int value);
+void SetShaderUniformUint(GLuint shaderID, const std::string &name, unsigned int value);
+void SetShaderUniformFloat(GLuint shaderID, const std::string &name, float value);
+void SetShaderUniformVec2(GLuint shaderID, const std::string &name, const glm::vec2 &value);
+void SetShaderUniformVec3(GLuint shaderID, const std::string &name, const glm::vec3 &value);
+void SetShaderUniformVec4(GLuint shaderID, const std::string &name, const glm::vec4 &value);
+void SetShaderUniformMat2(GLuint shaderID, const std::string &name, const glm::mat2 &value);
+void SetShaderUniformMat3(GLuint shaderID, const std::string &name, const glm::mat3 &value);
+void SetShaderUniformMat4(GLuint shaderID, const std::string &name, const glm::mat4 &value);
 
-    void SetInt(const std::string &name, int value) const;
-    void SetUint(const std::string &name, unsigned int value) const;
-    void SetFloat(const std::string &name, float value) const;
-    void SetVec2(const std::string &name, const glm::vec2 &vec) const;
-    void SetVec3(const std::string &name, const glm::vec3 &vec) const;
-    void SetVec4(const std::string &name, const glm::vec4 &vec) const;
-    void SetMat2(const std::string &name, const glm::mat2 &mat) const;
-    void SetMat3(const std::string &name, const glm::mat3 &mat) const;
-    void SetMat4(const std::string &name, const glm::mat4 &mat) const;
-};
+
 
