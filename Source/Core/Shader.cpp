@@ -28,7 +28,7 @@ GLuint CompileShader(const char* shaderCode, const GLenum shaderType) {
 GLuint LinkProgram(const std::initializer_list<GLuint> shaderIDs) {
     const GLuint program = glCreateProgram();
     for(const GLuint shader : shaderIDs) {
-        GL_CHECK_ERRORS(glAttachShader(program, shader));
+        glAttachShader(program, shader);
     }
 
     glLinkProgram(program);
