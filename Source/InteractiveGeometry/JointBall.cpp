@@ -13,7 +13,7 @@ CMRC_DECLARE(shaderRC);
 
 JointBall::JointBall(const unsigned int numDivisions) {
     GenerateMesh(numDivisions);
-    SetupModelToGL();
+    GL_CHECK_ERRORS(SetupMeshToGL())
     GL_CHECK_ERRORS(SetupShaderProgram());
 }
 
@@ -26,7 +26,7 @@ void JointBall::SetupShaderProgram() {
     programID = LinkProgram({ vsh, fsh });
 }
 
-void JointBall::SetupModelToGL() {
+void JointBall::SetupMeshToGL() {
     // 创建缓冲区对象
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
@@ -53,7 +53,7 @@ void JointBall::SetupModelToGL() {
 
     // 实例属性
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-    GL_CHECK_ERRORS(glBufferData(GL_ARRAY_BUFFER, sizeof(JointBall::InstanceAttributes) * 200, nullptr, GL_STATIC_DRAW));
+    GL_CHECK_ERRORS(glBufferData(GL_ARRAY_BUFFER, sizeof(JointBall::InstanceAttributes) * 200, nullptr, GL_DYNAMIC_DRAW));
 
     // 实例变换矩阵
     glEnableVertexAttribArray(2);

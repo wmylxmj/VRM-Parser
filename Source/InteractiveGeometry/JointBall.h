@@ -32,7 +32,7 @@ public:
 
 private:
     void GenerateMesh(unsigned int numDivisions);
-    void SetupModelToGL();
+    void SetupMeshToGL();
     void SetupShaderProgram();
 
 };
