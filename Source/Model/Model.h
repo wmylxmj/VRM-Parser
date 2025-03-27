@@ -15,8 +15,8 @@
 
 #define INVALID_PARENT 0XFFFFFFFF
 
-
 class Model {
+
 public:
 
     typedef struct {
@@ -41,7 +41,6 @@ public:
         unsigned int indexBase;
         unsigned int numIndices;
     } MeshEntry;
-
 
     std::vector<Bone> bones;
     std::map<std::string, unsigned int> boneNameIndexMapping; // maps a bone name to its index
