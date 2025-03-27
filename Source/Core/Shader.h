@@ -30,19 +30,3 @@ public:
     void SetMat4(const std::string &name, const glm::mat4 &mat) const;
 };
 
-class VertexShader : public Shader {
-public:
-    explicit VertexShader(const char* pFile);
-    ~VertexShader();
-};
-
-class FragmentShader : public Shader {
-public:
-    explicit FragmentShader(const char* pFile);
-    ~FragmentShader();
-};
-
-class ShaderProgram : public Shader {
-public:
-    ShaderProgram(const char *pVertexShaderFile, const char *pFragmentShaderFile);
-};
