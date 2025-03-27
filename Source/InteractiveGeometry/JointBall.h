@@ -13,6 +13,8 @@ public:
     GLuint vao{}, vbo{}, ebo{};
     GLuint instanceVBO{};
 
+    GLuint programID;
+
     struct Vertex {
         glm::vec3 position;
         glm::vec3 normal;

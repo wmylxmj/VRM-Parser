@@ -23,10 +23,8 @@ void JointBall::SetupShaderProgram() {
     GLuint vsh = CompileShader(vsFile.begin(), GL_VERTEX_SHADER);
     const auto fsFile = fileSystem.open("Source/InteractiveGeometry/Shaders/JointBall.fsh");
     GLuint fsh = CompileShader(fsFile.begin(), GL_FRAGMENT_SHADER);
-    LinkProgram({vsh, fsh});
+    programID = LinkProgram({ vsh, fsh });
 }
-
-
 
 void JointBall::SetupModelToGL() {
     // 创建缓冲区对象
