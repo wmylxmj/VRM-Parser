@@ -100,12 +100,9 @@ void MainApp::OnUpdate() {
     camera.aspect = (float)windowWidth / (float)windowHeight;
 
     GL_CHECK_ERRORS(glUseProgram(programID));
-    glm::mat4 matModel = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-    glm::mat4 matView = camera.GetCameraMatrix();
-    glm::mat4 matProjection = camera.GetPerspectiveMatrix();
-    glUniformMatrix4fv(glGetUniformLocation(programID, "matModel"), 1, GL_FALSE, &matModel[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(programID, "matView"), 1, GL_FALSE, &matView[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(programID, "matProjection"), 1, GL_FALSE, &matProjection[0][0]);
+    SetShaderUniformMat4(programID, "matModel", glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f)));
+    SetShaderUniformMat4(programID, "matView", camera.GetCameraMatrix());
+    SetShaderUniformMat4(programID, "matProjection", camera.GetPerspectiveMatrix());
 
     std::vector<glm::mat4> finalTransformations = CalcBonesFinalTransformations(*pModel);
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
