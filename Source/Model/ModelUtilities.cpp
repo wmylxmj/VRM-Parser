@@ -16,7 +16,7 @@ void SetupModelToGL(const Model& model, GLuint &vao,GLuint &vbo, GLuint &ebo) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     // 传输顶点数据
-    glBufferData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(Vertex), model.vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, model.vertices.size() * sizeof(Model::Vertex), model.vertices.data(), GL_STATIC_DRAW);
 
     // 传输索引数据
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -24,16 +24,16 @@ void SetupModelToGL(const Model& model, GLuint &vao,GLuint &vbo, GLuint &ebo) {
 
     // 顶点位置
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, position)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Model::Vertex), reinterpret_cast<void *>(offsetof(Model::Vertex, position)));
     // 顶点法线
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, normal)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Model::Vertex), reinterpret_cast<void *>(offsetof(Model::Vertex, normal)));
     // 顶点骨骼索引 注意对于整型，需要用IPointer
     glEnableVertexAttribArray(2);
-    glVertexAttribIPointer(2, NUM_BONES_PER_VERTEX, GL_UNSIGNED_INT, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, boneIndices)));
+    glVertexAttribIPointer(2, NUM_BONES_PER_VERTEX, GL_UNSIGNED_INT, sizeof(Model::Vertex), reinterpret_cast<void *>(offsetof(Model::Vertex, boneIndices)));
     // 顶点骨骼权重
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void *>(offsetof(Vertex, boneWeights)));
+    glVertexAttribPointer(3, NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(Model::Vertex), reinterpret_cast<void *>(offsetof(Model::Vertex, boneWeights)));
 
     glBindVertexArray(0);
 }
@@ -48,7 +48,7 @@ std::vector<glm::mat4> CalcBonesFinalTransformations(const Model& model) {
         // 如果已计算，则跳过
         if (bonesCalculated[i]) continue;
 
-        Bone bone(model.bones[i]);
+        Model::Bone bone(model.bones[i]);
 
         unsigned int parentIndex = bone.parentIndex;
         std::stack<unsigned int> parentChain;
@@ -63,7 +63,7 @@ std::vector<glm::mat4> CalcBonesFinalTransformations(const Model& model) {
             parentIndex = parentChain.top();
             parentChain.pop();
 
-            Bone parentBone = model.bones[parentIndex];
+            Model::Bone parentBone = model.bones[parentIndex];
 
             if (parentBone.parentIndex == INVALID_PARENT) {
                 globalTransformations[parentIndex] = parentBone.transformation;
