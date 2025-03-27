@@ -15,32 +15,34 @@
 
 #define INVALID_PARENT 0XFFFFFFFF
 
-typedef struct {
-    glm::vec3 position;
-    glm::vec3 normal;
-
-    // 骨骼索引和权重
-    unsigned int boneIndices[NUM_BONES_PER_VERTEX];
-    float boneWeights[NUM_BONES_PER_VERTEX];
-} Vertex;
-
-typedef struct {
-    std::string name;
-    unsigned int parentIndex;
-    glm::mat4 offsetMatrix;
-    glm::mat4 transformation;
-    glm::mat4 bindingPoseTransformation;
-} Bone;
-
-typedef struct {
-    unsigned int vertexBase;
-    unsigned int indexBase;
-    unsigned int numIndices;
-} MeshEntry;
 
 class Model {
-
 public:
+
+    typedef struct {
+        glm::vec3 position;
+        glm::vec3 normal;
+
+        // 骨骼索引和权重
+        unsigned int boneIndices[NUM_BONES_PER_VERTEX];
+        float boneWeights[NUM_BONES_PER_VERTEX];
+    } Vertex;
+
+    typedef struct {
+        std::string name;
+        unsigned int parentIndex;
+        glm::mat4 offsetMatrix;
+        glm::mat4 transformation;
+        glm::mat4 bindingPoseTransformation;
+    } Bone;
+
+    typedef struct {
+        unsigned int vertexBase;
+        unsigned int indexBase;
+        unsigned int numIndices;
+    } MeshEntry;
+
+
     std::vector<Bone> bones;
     std::map<std::string, unsigned int> boneNameIndexMapping; // maps a bone name to its index
     std::vector<MeshEntry> meshEntries;
@@ -58,3 +60,4 @@ private:
 protected:
     std::string m_directory;
 };
+
