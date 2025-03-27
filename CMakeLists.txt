@@ -45,6 +45,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
 include(ThirdParty/cmrc/CMakeRC.cmake)
 cmrc_add_resource_library(shaderRC
+        Source/Shaders/Shader.vsh
+        Source/Shaders/Shader.fsh
         Source/InteractiveGeometry/Shaders/JointBall.vsh
         Source/InteractiveGeometry/Shaders/JointBall.fsh
 )

@@ -3,6 +3,9 @@
 #include <cassert>
 #include <stack>
 
+#include <cmrc/cmrc.hpp>
+CMRC_DECLARE(shaderRC);
+
 #include "Core/Camera.h"
 #include "Core/PrecompiledHeader.h"
 #include "Core/IApplication.h"
@@ -16,7 +19,7 @@ class MainApp final : public IApplication {
 public:
     GLFWwindow* window;
     Camera camera;
-    std::unique_ptr<ShaderProgram> pShader;
+    GLuint programID;
     std::unique_ptr<Model> pModel;
     std::unique_ptr<JointBall> pJointBall;
     GLuint vao, vbo, ebo;
@@ -80,7 +83,13 @@ void MainApp::OnInit() {
     camera.eyePosition = glm::vec3(0.5*(xMax+xMin), 0.5*(yMin+yMax), zMax+std::max(zMax-zMin, std::max(xMax-xMin, yMax-yMin)));
     camera.zFar = 10000;
 
-    pShader = std::make_unique<ShaderProgram>(R"(E:\VRM-Parser\Source\Shaders\Shader.vsh)", R"(E:\VRM-Parser\Source\Shaders\Shader.fsh)");
+    const auto fileSystem = cmrc::shaderRC::get_filesystem();
+    const auto vsFile = fileSystem.open(R"(Source/Shaders/Shader.vsh)");
+    GLuint vsh = CompileShader(vsFile.begin(), GL_VERTEX_SHADER);
+    const auto fsFile = fileSystem.open(R"(Source/Shaders/Shader.fsh)");
+    GLuint fsh = CompileShader(fsFile.begin(), GL_FRAGMENT_SHADER);
+    programID = LinkProgram({vsh, fsh});
+
     GL_CHECK_ERRORS();
 }
 
@@ -89,11 +98,14 @@ void MainApp::OnUpdate() {
     glfwGetFramebufferSize(window, &windowWidth, &windowHeight);
 
     camera.aspect = (float)windowWidth / (float)windowHeight;
-    const ShaderProgram shader = *pShader;
-    GL_CHECK_ERRORS(glUseProgram(shader.glID));
-    GL_CHECK_ERRORS(shader.SetMat4("matModel", glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f))));
-    shader.SetMat4("matView", camera.GetCameraMatrix());
-    shader.SetMat4("matProjection", camera.GetPerspectiveMatrix());
+
+    GL_CHECK_ERRORS(glUseProgram(programID));
+    glm::mat4 matModel = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 matView = camera.GetCameraMatrix();
+    glm::mat4 matProjection = camera.GetPerspectiveMatrix();
+    glUniformMatrix4fv(glGetUniformLocation(programID, "matModel"), 1, GL_FALSE, &matModel[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(programID, "matView"), 1, GL_FALSE, &matView[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(programID, "matProjection"), 1, GL_FALSE, &matProjection[0][0]);
 
     std::vector<glm::mat4> finalTransformations = CalcBonesFinalTransformations(*pModel);
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
