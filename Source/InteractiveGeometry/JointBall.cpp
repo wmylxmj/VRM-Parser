@@ -135,4 +135,13 @@ void JointBall::GenerateMesh(const unsigned int numDivisions) {
     }
 }
 
-
+void JointBall::DrawInstances(std::vector<InstanceAttributes> instances, glm::mat4 matModel, glm::mat4 matView, glm::mat4 matProjection) {
+    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, instances.size() * sizeof(InstanceAttributes), instances.data());
+    glUseProgram(programID);
+    SetShaderUniformMat4(programID, "matModel", matModel);
+    SetShaderUniformMat4(programID, "matView", matView);
+    SetShaderUniformMat4(programID, "matProjection", matProjection);
+    glBindVertexArray(vao);
+    glDrawArraysInstanced(GL_TRIANGLES, 0, indices.size(), instances.size());
+}

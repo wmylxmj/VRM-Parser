@@ -34,5 +34,5 @@ private:
     void GenerateMesh(unsigned int numDivisions);
     void SetupMeshToGL();
     void SetupShaderProgram();
-
+    void DrawInstances(std::vector<InstanceAttributes> instances, glm::mat4 matModel, glm::mat4 matView, glm::mat4 matProjection);
 };
