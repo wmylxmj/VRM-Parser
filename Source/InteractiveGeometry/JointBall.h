@@ -21,7 +21,7 @@ public:
     };
 
     struct InstanceAttributes {
-        glm::mat4 matModel;
+        glm::mat4 transformation;
         glm::vec4 color;
     };
 
