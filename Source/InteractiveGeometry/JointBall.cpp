@@ -144,4 +144,6 @@ void JointBall::DrawInstances(const std::vector<InstanceAttributes> &instances, 
     SetShaderUniformMat4(programID, "matProjection", matProjection);
     glBindVertexArray(vao);
     glDrawArraysInstanced(GL_TRIANGLES, 0, indices.size(), instances.size());
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
