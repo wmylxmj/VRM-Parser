@@ -8,11 +8,11 @@ layout (location = 3) in vec4 transformCol1;
 layout (location = 4) in vec4 transformCol2;
 layout (location = 5) in vec4 transformCol3;
 
-
 layout (location = 6) in vec4 color;
 
 uniform mat4 matProjection;
 uniform mat4 matView;
+uniform mat4 matModel;
 
 out vec4 vColor;
 
