@@ -24,6 +24,8 @@ add_executable(${PROJECT_NAME}
         Source/Model/ModelUtilities.h
         Source/InteractiveGeometry/JointBall.cpp
         Source/InteractiveGeometry/JointBall.h
+        Source/Model/ModelDriver.cpp
+        Source/Model/ModelDriver.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/ThirdParty)
