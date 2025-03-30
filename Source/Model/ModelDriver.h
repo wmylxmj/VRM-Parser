@@ -11,8 +11,14 @@
 class ModelDriver {
 
 public:
-    std::shared_ptr<Model> model;
+    std::shared_ptr<Model> pModel;
 
     std::vector<glm::mat4> finalBoneTransformations;
+    std::vector<glm::mat4> globalBoneTransformations;
+
+    explicit ModelDriver(const std::shared_ptr<Model>& pModel);
+
+    void CalcBonesTransformations();
+
 
 };
