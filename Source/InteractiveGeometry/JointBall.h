@@ -8,7 +8,6 @@
 #include <vector>
 
 class JointBall {
-
 public:
     GLuint vao{}, vbo{}, ebo{};
     GLuint instanceVBO{};
@@ -30,9 +29,11 @@ public:
 
     explicit JointBall(unsigned int numDivisions = 18);
 
+    void DrawInstances(const std::vector<InstanceAttributes> &instances, const glm::mat4 &matModel, const glm::mat4 &matView, const glm::mat4 &matProjection) const;
+
 private:
     void GenerateMesh(unsigned int numDivisions);
     void SetupMeshToGL();
     void SetupShaderProgram();
-    void DrawInstances(const std::vector<InstanceAttributes> &instances, const glm::mat4 &matModel, const glm::mat4 &matView, const glm::mat4 &matProjection) const;
 };
+

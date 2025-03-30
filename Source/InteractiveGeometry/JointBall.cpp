@@ -64,7 +64,7 @@ void JointBall::SetupMeshToGL() {
     glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(offsetof(JointBall::InstanceAttributes, transformation)));
     glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(4 * sizeof(float) + offsetof(JointBall::InstanceAttributes, transformation)));
     glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(8 * sizeof(float) + offsetof(JointBall::InstanceAttributes, transformation)));
-    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(12 * sizeof(float) * offsetof(JointBall::InstanceAttributes, transformation)));
+    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(12 * sizeof(float) + offsetof(JointBall::InstanceAttributes, transformation)));
 
     GL_CHECK_ERRORS(glVertexAttribDivisor(2, 1));
     GL_CHECK_ERRORS(glVertexAttribDivisor(3, 1));
@@ -143,7 +143,7 @@ void JointBall::DrawInstances(const std::vector<InstanceAttributes> &instances, 
     SetShaderUniformMat4(programID, "matView", matView);
     SetShaderUniformMat4(programID, "matProjection", matProjection);
     glBindVertexArray(vao);
-    glDrawArraysInstanced(GL_TRIANGLES, 0, indices.size(), instances.size());
+    glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, nullptr, instances.size());
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
