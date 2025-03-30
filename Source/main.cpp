@@ -39,6 +39,9 @@ void MainApp::OnInit() {
     MakeContextCurrent(window);
 
     glEnable(GL_DEPTH_TEST);
+    // 启用混合
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // 导入模型
     pModelDriver = std::make_unique<ModelDriver>(std::make_shared<VrmModel>(R"(E:\vrm\20220331_1455\20220331_1455\base body\black cat base body v3.5.0.vrm)"));
@@ -128,7 +131,7 @@ void MainApp::OnRender() {
         JointBall::InstanceAttributes instance{};
         instance.transformation = glm::translate(glm::mat4(1), {pModelDriver->globalBoneTransformations[i][3][0],
             pModelDriver->globalBoneTransformations[i][3][1], pModelDriver->globalBoneTransformations[i][3][2]}) * glm::scale(glm::mat4(1), {0.05, 0.05, 0.05});
-        instance.color = {0, 1, 0, 0.2};
+        instance.color = {0, 1, 0, 0.1};
         jointBallInstances.push_back(instance);
     }
     pJointBall->DrawInstances(jointBallInstances,
