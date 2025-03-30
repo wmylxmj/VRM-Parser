@@ -13,6 +13,7 @@ CMRC_DECLARE(shaderRC);
 #include "Core//Shader.h"
 #include "Model/ModelUtilities.h"
 #include "InteractiveGeometry/JointBall.h"
+#include "Model/ModelDriver.h"
 
 class MainApp final : public IApplication {
 
@@ -20,7 +21,7 @@ public:
     GLFWwindow* window;
     Camera camera;
     GLuint programID;
-    std::unique_ptr<Model> pModel;
+    std::unique_ptr<ModelDriver> pModelDriver;
     std::unique_ptr<JointBall> pJointBall;
     GLuint vao, vbo, ebo;
     GLuint ubo;
@@ -39,24 +40,24 @@ void MainApp::OnInit() {
 
     glEnable(GL_DEPTH_TEST);
     // 导入模型
-    pModel = std::make_unique<VrmModel>(R"(E:\vrm\20220331_1455\20220331_1455\base body\black cat base body v3.5.0.vrm)");
+    pModelDriver = std::make_unique<ModelDriver>(std::make_shared<VrmModel>(R"(E:\vrm\20220331_1455\20220331_1455\base body\black cat base body v3.5.0.vrm)"));
     pJointBall = std::make_unique<JointBall>();
 
 
     // 模型上传
-    GL_CHECK_ERRORS(SetupModelToGL(*pModel, vao, vbo, ebo));
+    GL_CHECK_ERRORS(SetupModelToGL(*pModelDriver->pModel, vao, vbo, ebo));
 
-    pModel->bones[pModel->boneNameIndexMapping["J_Bip_R_LowerLeg"]].transformation =
-        pModel->bones[pModel->boneNameIndexMapping["J_Bip_R_LowerLeg"]].bindingPoseTransformation *
+    pModelDriver->pModel->bones[pModelDriver->pModel->boneNameIndexMapping["J_Bip_R_LowerLeg"]].transformation =
+        pModelDriver->pModel->bones[pModelDriver->pModel->boneNameIndexMapping["J_Bip_R_LowerLeg"]].bindingPoseTransformation *
         glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(-1.0f, 0.0f, 0.0f));
-    std::vector<glm::mat4> finalTransformations = CalcBonesFinalTransformations(*pModel);
+    std::vector<glm::mat4> finalTransformations = CalcBonesFinalTransformations(*pModelDriver->pModel);
     glGenBuffers(1, &ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
     glBufferData(GL_UNIFORM_BUFFER, sizeof(glm::mat4)*200, nullptr, GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, ubo); // 关联 UBO 到绑定点 0
 
-    for (unsigned int i = 0; i < pModel->bones.size(); i++) {
-        std::cout << pModel->bones[i].name << std::endl;
+    for (unsigned int i = 0; i < pModelDriver->pModel->bones.size(); i++) {
+        std::cout << pModelDriver->pModel->bones[i].name << std::endl;
         glm::mat4 transformation = finalTransformations[i];
         std::cout << transformation[0][0] << transformation[1][0] << transformation[2][0]<< transformation[3][0] << std::endl;
         std::cout << transformation[0][1] << transformation[1][1] << transformation[2][1]<< transformation[3][1] << std::endl;
@@ -71,7 +72,7 @@ void MainApp::OnInit() {
     float yMax = -FLT_MAX;
     float zMin = FLT_MAX;
     float zMax = -FLT_MAX;
-    for (auto vertex: pModel->vertices) {
+    for (auto vertex: pModelDriver->pModel->vertices) {
         if (vertex.position.x < xMin) xMin = vertex.position.x;
         if (vertex.position.x > xMax) xMax = vertex.position.x;
         if (vertex.position.y < yMin) yMin = vertex.position.y;
@@ -104,18 +105,17 @@ void MainApp::OnUpdate() {
     SetShaderUniformMat4(programID, "matView", camera.GetCameraMatrix());
     SetShaderUniformMat4(programID, "matProjection", camera.GetPerspectiveMatrix());
 
-    std::vector<glm::mat4> finalTransformations = CalcBonesFinalTransformations(*pModel);
+    pModelDriver->CalcBonesTransformations();
     glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4)*finalTransformations.size(), finalTransformations.data());
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4)*pModelDriver->finalBoneTransformations.size(), pModelDriver->finalBoneTransformations.data());
 }
 
 void MainApp::OnRender() {
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    const Model model = *pModel;
     GL_CHECK_ERRORS(glBindVertexArray(vao));
-    GL_CHECK_ERRORS(glDrawElements(GL_TRIANGLES, model.indices.size(), GL_UNSIGNED_INT, nullptr));
+    GL_CHECK_ERRORS(glDrawElements(GL_TRIANGLES, pModelDriver->pModel->indices.size(), GL_UNSIGNED_INT, nullptr));
     glBindVertexArray(0);
 
     glfwSwapBuffers(window);

@@ -7,6 +7,8 @@
 
 ModelDriver::ModelDriver(const std::shared_ptr<Model>& pModel) {
     this->pModel = pModel;
+    globalBoneTransformations.resize(pModel->bones.size());
+    finalBoneTransformations.resize(pModel->bones.size());
 }
 
 void ModelDriver::CalcBonesTransformations() {
