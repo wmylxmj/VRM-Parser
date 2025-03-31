@@ -55,26 +55,20 @@ void JointBall::SetupMeshToGL() {
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
     GL_CHECK_ERRORS(glBufferData(GL_ARRAY_BUFFER, sizeof(JointBall::InstanceAttributes) * 200, nullptr, GL_DYNAMIC_DRAW));
 
-    // 实例变换矩阵
+    // 实例球心
     glEnableVertexAttribArray(2);
-    glEnableVertexAttribArray(3);
-    glEnableVertexAttribArray(4);
-    glEnableVertexAttribArray(5);
-
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(offsetof(JointBall::InstanceAttributes, transformation)));
-    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(4 * sizeof(float) + offsetof(JointBall::InstanceAttributes, transformation)));
-    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(8 * sizeof(float) + offsetof(JointBall::InstanceAttributes, transformation)));
-    glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(12 * sizeof(float) + offsetof(JointBall::InstanceAttributes, transformation)));
-
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(offsetof(JointBall::InstanceAttributes, center)));
     GL_CHECK_ERRORS(glVertexAttribDivisor(2, 1));
+
+    // 实例半径
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(offsetof(JointBall::InstanceAttributes, radius)));
     GL_CHECK_ERRORS(glVertexAttribDivisor(3, 1));
-    GL_CHECK_ERRORS(glVertexAttribDivisor(4, 1));
-    GL_CHECK_ERRORS(glVertexAttribDivisor(5, 1));
 
     // 实例颜色
-    glEnableVertexAttribArray(6);
-    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(offsetof(JointBall::InstanceAttributes, color)));
-    GL_CHECK_ERRORS(glVertexAttribDivisor(6, 1));
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(JointBall::InstanceAttributes), reinterpret_cast<void *>(offsetof(JointBall::InstanceAttributes, color)));
+    GL_CHECK_ERRORS(glVertexAttribDivisor(4, 1));
 
     glBindVertexArray(0);
 }

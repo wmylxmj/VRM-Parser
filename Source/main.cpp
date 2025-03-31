@@ -129,8 +129,8 @@ void MainApp::OnRender() {
     for (int i = 0; i < pModelDriver->pModel->bones.size(); i++) {
         //std::cout << pModelDriver->globalBoneTransformations[i][3][0] << " " << pModelDriver->globalBoneTransformations[i][3][1] << " " << pModelDriver->globalBoneTransformations[i][3][2] << std::endl;
         JointBall::InstanceAttributes instance{};
-        instance.transformation = glm::translate(glm::mat4(1), {pModelDriver->globalBoneTransformations[i][3][0],
-            pModelDriver->globalBoneTransformations[i][3][1], pModelDriver->globalBoneTransformations[i][3][2]}) * glm::scale(glm::mat4(1), {0.05, 0.05, 0.05});
+        instance.center = {pModelDriver->globalBoneTransformations[i][3][0], pModelDriver->globalBoneTransformations[i][3][1], pModelDriver->globalBoneTransformations[i][3][2]};
+        instance.radius = 0.05;
         instance.color = {0, 1, 0, 0.1};
         jointBallInstances.push_back(instance);
     }

@@ -20,7 +20,8 @@ public:
     };
 
     struct InstanceAttributes {
-        glm::mat4 transformation;
+        glm::vec3 center;
+        float radius;
         glm::vec4 color;
     };
 
