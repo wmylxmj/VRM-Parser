@@ -128,7 +128,6 @@ void MainApp::OnRender() {
     glDisable(GL_DEPTH_TEST);
     std::vector<JointBall::InstanceAttributes> jointBallInstances;
     for (const auto& [name, index] : pVrmModel->humanBoneNameIndexMapping) {
-        std::cout << name << std::endl;
         JointBall::InstanceAttributes instance{};
         instance.center = {pModelDriver->globalBoneTransformations[index][3][0], pModelDriver->globalBoneTransformations[index][3][1], pModelDriver->globalBoneTransformations[index][3][2]};
         instance.radius = 0.05;
