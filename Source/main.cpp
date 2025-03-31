@@ -21,6 +21,7 @@ public:
     GLFWwindow* window;
     Camera camera;
     GLuint programID;
+    std::shared_ptr<VrmModel> pVrmModel;
     std::unique_ptr<ModelDriver> pModelDriver;
     std::unique_ptr<JointBall> pJointBall;
     GLuint vao, vbo, ebo;
@@ -44,7 +45,8 @@ void MainApp::OnInit() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // 导入模型
-    pModelDriver = std::make_unique<ModelDriver>(std::make_shared<VrmModel>(R"(E:\vrm\20220331_1455\20220331_1455\base body\black cat base body v3.5.0.vrm)"));
+    pVrmModel = std::make_shared<VrmModel>(R"(E:\vrm\20220331_1455\20220331_1455\base body\black cat base body v3.5.0.vrm)");
+    pModelDriver = std::make_unique<ModelDriver>(pVrmModel);
     pJointBall = std::make_unique<JointBall>();
 
 
@@ -124,14 +126,19 @@ void MainApp::OnRender() {
     glBindVertexArray(0);
 
     glDisable(GL_DEPTH_TEST);
-    //glClear(GL_DEPTH_BUFFER_BIT);
     std::vector<JointBall::InstanceAttributes> jointBallInstances;
-    for (int i = 0; i < pModelDriver->pModel->bones.size(); i++) {
-        //std::cout << pModelDriver->globalBoneTransformations[i][3][0] << " " << pModelDriver->globalBoneTransformations[i][3][1] << " " << pModelDriver->globalBoneTransformations[i][3][2] << std::endl;
+    for (const auto& [name, index] : pVrmModel->humanBoneNameIndexMapping) {
+        std::cout << name << std::endl;
         JointBall::InstanceAttributes instance{};
-        instance.center = {pModelDriver->globalBoneTransformations[i][3][0], pModelDriver->globalBoneTransformations[i][3][1], pModelDriver->globalBoneTransformations[i][3][2]};
+        instance.center = {pModelDriver->globalBoneTransformations[index][3][0], pModelDriver->globalBoneTransformations[index][3][1], pModelDriver->globalBoneTransformations[index][3][2]};
         instance.radius = 0.05;
         instance.color = {0, 1, 0, 0.1};
+        if (name.find("Distal") != std::string::npos) instance.radius = 0.01;
+        if (name.find("Intermediate") != std::string::npos) instance.radius = 0.01;
+        if (name.find("Proximal") != std::string::npos) instance.radius = 0.01;
+        if (name.find("Eye") != std::string::npos) instance.radius = 0.02;
+        if (name.find("Hand") != std::string::npos) instance.radius = 0.04;
+        if (name.find("UpperLeg") != std::string::npos) instance.radius = 0.07;
         jointBallInstances.push_back(instance);
     }
     pJointBall->DrawInstances(jointBallInstances,
